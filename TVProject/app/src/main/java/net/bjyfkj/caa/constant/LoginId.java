@@ -5,6 +5,6 @@ package net.bjyfkj.caa.constant;
  */
 public class LoginId {
 
-    public static final String USERLOGINSTATE = "userid";
+    public static final String DEVICELOGINSTATE = "device_id";
 
 }
