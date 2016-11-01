@@ -57,4 +57,12 @@ public class DeviceLoginPresenter {
     }
 
 
+    /***
+     * 退出登录
+     */
+    public void logout() {
+
+    }
+
+
 }

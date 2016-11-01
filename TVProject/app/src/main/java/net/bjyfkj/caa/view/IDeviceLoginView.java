@@ -8,7 +8,6 @@ public interface IDeviceLoginView {
 
     void alertView();
 
-
     String getSPDevice_id();
 
     void setDeviceId();
