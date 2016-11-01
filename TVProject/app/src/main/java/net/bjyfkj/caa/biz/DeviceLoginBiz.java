@@ -1,13 +1,9 @@
 package net.bjyfkj.caa.biz;
 
 import android.util.Log;
-import android.widget.Toast;
 
-import net.bjyfkj.caa.constant.LoginId;
-import net.bjyfkj.caa.util.JPushUtil;
 import net.bjyfkj.caa.util.MD5Util;
 import net.bjyfkj.caa.util.PropertiesUtils;
-import net.bjyfkj.caa.util.SharedPreferencesUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
