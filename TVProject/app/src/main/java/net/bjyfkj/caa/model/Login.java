@@ -1,5 +1,6 @@
 package net.bjyfkj.caa.model;
 
+import android.util.Log;
 import android.widget.Toast;
 
 import net.bjyfkj.caa.constant.LoginId;
@@ -41,6 +42,8 @@ public class Login {
         RequestParams params = new RequestParams(PropertiesUtils.getpath("logout"));
         params.addBodyParameter("device_id", SharedPreferencesUtils.getParam(x.app(), LoginId.DEVICELOGINSTATE, "").toString());
         params.addBodyParameter("sign", sign + "");
+        Log.i("logout  -- device_id", SharedPreferencesUtils.getParam(x.app(), LoginId.DEVICELOGINSTATE, "").toString() + "");
+        Log.i("logout  -- sign", sign + "");
         x.http().post(params, new Callback.CommonCallback<String>() {
             @Override
             public void onSuccess(String result) {

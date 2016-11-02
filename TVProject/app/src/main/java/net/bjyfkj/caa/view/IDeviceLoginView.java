@@ -12,5 +12,5 @@ public interface IDeviceLoginView {
 
     void setDeviceId();
 
-    void isdialog(boolean isSuccess);
+    void isdialog(String device_id, boolean isSuccess);
 }

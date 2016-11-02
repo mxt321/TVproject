@@ -33,7 +33,7 @@ public class DeviceLoginPresenter {
                 loginProsenter(iDeviceLoginView.getDeviceId());
             }
         } else {
-            Log.i("getDeviceId", iDeviceLoginView.getSPDevice_id() + "");
+            Log.i("getSPDevice_id", iDeviceLoginView.getSPDevice_id() + "");
             loginProsenter(iDeviceLoginView.getSPDevice_id());
         }
     }
@@ -45,13 +45,13 @@ public class DeviceLoginPresenter {
         iDeviceLoginBiz.login(device_id, new OnDeviceLoginLinsterenr() {
             @Override
             public void loginSuccess(String device_id, boolean islogin) {
-                iDeviceLoginView.isdialog(true);
+                iDeviceLoginView.isdialog(device_id, true);
             }
 
             @Override
             public void loginFailed(boolean islogin) {
                 iDeviceLoginView.setDeviceId();
-                iDeviceLoginView.isdialog(false);
+                iDeviceLoginView.isdialog(null, false);
             }
         });
     }

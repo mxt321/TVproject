@@ -13,7 +13,6 @@ import cn.jpush.android.api.TagAliasCallback;
 public class JPushUtil {
 
 
-
     /***
      * 设置别名
      *
@@ -21,7 +20,7 @@ public class JPushUtil {
      * @param username
      * @return
      */
-    public static String setAlias(Context content, String username) {
+    public static String setAlias(Context content, final String username) {
         JPushInterface.setAlias(content, username,
                 new TagAliasCallback() {
 
@@ -29,7 +28,7 @@ public class JPushUtil {
                     public void gotResult(int responseCode,
                                           String alias, Set<String> tags) {
                         if (responseCode == 0) {
-                            System.out.println("jpush alias@@@@@别名设置成功");
+                            System.out.println("jpush alias@@@@@别名设置成功  - - " + username);
                         }
                     }
                 });

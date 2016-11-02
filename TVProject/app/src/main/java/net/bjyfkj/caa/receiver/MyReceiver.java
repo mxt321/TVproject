@@ -24,6 +24,8 @@ public class MyReceiver extends BroadcastReceiver {
             // 自定义消息不会展示在通知栏，完全要开发者写代码去处理
             String content = bundle.getString(JPushInterface.EXTRA_MESSAGE);
             String extra = bundle.getString(JPushInterface.EXTRA_EXTRA);
+            Log.i("收到了自定义消息@@消息内容是:", content + "");
+            Log.i("收到了自定义消息@@消息extra是", extra + "");
             Toast.makeText(context, "收到了自定义消息@@消息内容是:" + content, Toast.LENGTH_SHORT).show();
             Toast.makeText(context, "收到了自定义消息@@消息extra是:" + extra, Toast.LENGTH_SHORT).show();
         }

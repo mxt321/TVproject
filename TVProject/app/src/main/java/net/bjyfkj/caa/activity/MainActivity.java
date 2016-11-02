@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -21,10 +22,14 @@ import net.bjyfkj.caa.view.IDeviceLoginView;
 import org.xutils.x;
 
 import butterknife.ButterKnife;
+import butterknife.InjectView;
+import butterknife.OnClick;
 import cn.jpush.android.api.JPushInterface;
 
 public class MainActivity extends Activity implements IDeviceLoginView {
 
+    @InjectView(R.id.button)
+    Button button;
     private AlertDialog.Builder builder;
     private View view;
     private DeviceLoginPresenter deviceLoginPresenter;
@@ -85,11 +90,11 @@ public class MainActivity extends Activity implements IDeviceLoginView {
     }
 
     @Override
-    public void isdialog(boolean isSuccess) {
+    public void isdialog(String deviceid, boolean isSuccess) {
         if (isSuccess) {
             Toast.makeText(x.app(), "登陆成功", Toast.LENGTH_SHORT).show();
-            SharedPreferencesUtils.setParam(x.app(), LoginId.DEVICELOGINSTATE, device_id + "");
-            JPushUtil.setAlias(x.app(), "d" + device_id);
+            SharedPreferencesUtils.setParam(x.app(), LoginId.DEVICELOGINSTATE, deviceid + "");
+            JPushUtil.setAlias(x.app(), "d" + deviceid);
         } else {
             Toast.makeText(x.app(), "登录失败", Toast.LENGTH_SHORT).show();
             builderShow();
@@ -119,12 +124,14 @@ public class MainActivity extends Activity implements IDeviceLoginView {
     }
 
 
-
-
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        Login.logout();
+    }
+
+    @OnClick(R.id.button)
+    public void onClick() {
         Login.logout();
     }
 }

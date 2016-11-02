@@ -22,6 +22,7 @@ public class DeviceLoginBiz implements IDeviceLoginBiz {
         RequestParams params = new RequestParams(PropertiesUtils.getpath("login"));
         params.addBodyParameter("device_id", device_id);
         params.addBodyParameter("sign", sign);
+        Log.i("device_id", device_id + "");
         Log.i("sign", sign + "");
 
         x.http().post(params, new Callback.CommonCallback<String>() {
