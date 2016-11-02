@@ -20,7 +20,7 @@ public class JPushUtil {
      * @param username
      * @return
      */
-    public static String setAlias(Context content, final String username) {
+    public static void setAlias(Context content, final String username) {
         JPushInterface.setAlias(content, username,
                 new TagAliasCallback() {
 
@@ -32,6 +32,5 @@ public class JPushUtil {
                         }
                     }
                 });
-        return null;
     }
 }

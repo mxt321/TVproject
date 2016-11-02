@@ -46,7 +46,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
+        <service android:name=".service.JPushService">
+            
+        </service>
 
         <!-- Required SDK 核心功能-->
         <!-- option since 2.0.5 可配置PushService，DaemonService,PushReceiver,AlarmReceiver的android:process参数 将JPush相关组件设置为一个独立进程 -->
@@ -117,7 +119,7 @@
 
         <!-- User defined. 用户自定义的广播接收器-->
         <receiver
-            android:name=".receiver.MyReceiver"
+            android:name=".receiver.JPushReceiver"
             android:enabled="true">
             <intent-filter>
                 <!--Required 用户注册SDK的intent-->

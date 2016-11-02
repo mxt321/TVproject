@@ -12,7 +12,7 @@ import cn.jpush.android.api.JPushInterface;
 /**
  * Created by YFKJ-1 on 2016/10/28.
  */
-public class MyReceiver extends BroadcastReceiver {
+public class JPushReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {

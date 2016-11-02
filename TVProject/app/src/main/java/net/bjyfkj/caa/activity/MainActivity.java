@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -22,14 +21,10 @@ import net.bjyfkj.caa.view.IDeviceLoginView;
 import org.xutils.x;
 
 import butterknife.ButterKnife;
-import butterknife.InjectView;
-import butterknife.OnClick;
 import cn.jpush.android.api.JPushInterface;
 
 public class MainActivity extends Activity implements IDeviceLoginView {
 
-    @InjectView(R.id.button)
-    Button button;
     private AlertDialog.Builder builder;
     private View view;
     private DeviceLoginPresenter deviceLoginPresenter;
@@ -130,8 +125,4 @@ public class MainActivity extends Activity implements IDeviceLoginView {
         Login.logout();
     }
 
-    @OnClick(R.id.button)
-    public void onClick() {
-        Login.logout();
-    }
 }
