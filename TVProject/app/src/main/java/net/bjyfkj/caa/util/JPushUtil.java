@@ -23,7 +23,6 @@ public class JPushUtil {
     public static void setAlias(Context content, final String username) {
         JPushInterface.setAlias(content, username,
                 new TagAliasCallback() {
-
                     @Override
                     public void gotResult(int responseCode,
                                           String alias, Set<String> tags) {
