@@ -10,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.MediaController;
-import android.widget.Toast;
 import android.widget.VideoView;
 
 import net.bjyfkj.caa.R;
@@ -105,6 +104,7 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
         if (isSuccess) {
             SharedPreferencesUtils.setParam(x.app(), LoginId.DEVICELOGINSTATE, deviceid + "");
             JPushUtil.setAlias(x.app(), "d" + deviceid);
+            deviceLoginPresenter.updateDeviceTime();
             deviceLoginPresenter.getVideoPlay();
         } else {
             builderShow();
@@ -146,7 +146,6 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
     public void downLoadSuccess() {
         Log.i("CAAdownLoadSuccess -- ", "下载成功");
         if (playlistposition < videolist.size()) {
-            Toast.makeText(MainActivity.this, videolist.size() + "", Toast.LENGTH_SHORT).show();
             playlistposition += 1;
             deviceDownLoadVideoPresenter.downLoadVideo();
         } else {

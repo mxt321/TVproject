@@ -7,6 +7,7 @@ import net.bjyfkj.caa.mvp.biz.IDeviceLoginBiz;
 import net.bjyfkj.caa.mvp.biz.OnDeviceGetPlayListener;
 import net.bjyfkj.caa.mvp.biz.OnDeviceLoginListener;
 import net.bjyfkj.caa.entity.VideoData;
+import net.bjyfkj.caa.mvp.biz.OnUpdateDeviceTimeListener;
 import net.bjyfkj.caa.mvp.view.IDeviceLoginView;
 
 import java.util.List;
@@ -70,6 +71,20 @@ public class DeviceLoginPresenter {
             @Override
             public void loginFailed() {
 
+            }
+        });
+    }
+
+    public void updateDeviceTime() {
+        iDeviceLoginBiz.updateDevicetime(iDeviceLoginView.getSPDevice_id().toString(), new OnUpdateDeviceTimeListener() {
+            @Override
+            public void updateSuccess() {
+                Log.i("updateSuccess", "修改系统时间成功");
+            }
+
+            @Override
+            public void updateFailed() {
+                Log.i("updateFailed", "修改系统时间失败");
             }
         });
     }

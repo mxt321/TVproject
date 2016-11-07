@@ -6,6 +6,7 @@ import net.bjyfkj.caa.entity.VideoData;
 import net.bjyfkj.caa.util.GsonUtils;
 import net.bjyfkj.caa.util.MD5Util;
 import net.bjyfkj.caa.util.PropertiesUtils;
+import net.bjyfkj.caa.util.UpdateTimeUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -23,6 +24,7 @@ public class DeviceLoginBiz implements IDeviceLoginBiz {
     @Override
     public void login(final String device_id, final OnDeviceLoginListener linsterenr) {
         String sign = MD5Util.encrypt("Device" + MD5Util.encrypt("bjyfkj4006010136") + "device_login");
+        Log.i("sign", sign + "");
         RequestParams params = new RequestParams(PropertiesUtils.getpath("login"));
         params.addBodyParameter("device_id", device_id);
         params.addBodyParameter("sign", sign);
@@ -82,6 +84,50 @@ public class DeviceLoginBiz implements IDeviceLoginBiz {
                         linsterenr.loginSuccess(list);
                     } else {
                         linsterenr.loginFailed();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+
+            }
+
+            @Override
+            public void onCancelled(CancelledException cex) {
+
+            }
+
+            @Override
+            public void onFinished() {
+
+            }
+        });
+    }
+
+    @Override
+    public void updateDevicetime(String device_id, final OnUpdateDeviceTimeListener listener) {
+        String sign = MD5Util.encrypt("Device" + MD5Util.encrypt("bjyfkj4006010136") + "getDateTime");
+        Log.i("sign", sign + "");
+        RequestParams params = new RequestParams(PropertiesUtils.getpath("getDateTime"));
+        params.addBodyParameter("device_id", device_id);
+        params.addBodyParameter("sign", sign);
+        x.http().post(params, new Callback.CommonCallback<String>() {
+            @Override
+            public void onSuccess(String result) {
+                try {
+                    JSONObject jsonObject = new JSONObject(result);
+                    int jsonInt = jsonObject.getInt("status");
+                    if (jsonInt == 1) {
+                        JSONObject jsonObject1 = new JSONObject(jsonObject.get("data").toString());
+                        String datetime = jsonObject1.getString("datetime");
+                        UpdateTimeUtil.testDate(datetime);
+                        Log.i("datetime", datetime + "");
+                        listener.updateSuccess();
+                    } else {
+                        listener.updateFailed();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();

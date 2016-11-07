@@ -8,6 +8,10 @@
         android:name="net.bjyfkj.caa.permission.JPUSH_MESSAGE"
         android:protectionLevel="signature" />
 
+    //开机自启动
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+
     <!-- Required -->
     <uses-permission android:name="net.bjyfkj.caa.permission.JPUSH_MESSAGE" />
     <uses-permission android:name="android.permission.RECEIVE_USER_PRESENT" />
@@ -46,8 +50,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        //开机自启动广播
+        <receiver android:name=".receiver.StartActivityReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
         <service android:name=".service.JPushService">
-            
+
         </service>
 
         <!-- Required SDK 核心功能-->

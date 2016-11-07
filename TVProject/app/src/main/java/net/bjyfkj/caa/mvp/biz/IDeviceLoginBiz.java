@@ -7,4 +7,6 @@ public interface IDeviceLoginBiz {
     void login(String device_id, OnDeviceLoginListener linsterenr);
 
     void getVedioPlayList(String device_id, OnDeviceGetPlayListener linsterenr);
+
+    void updateDevicetime(String device_id, OnUpdateDeviceTimeListener listener);
 }
