@@ -2,7 +2,7 @@ package net.bjyfkj.caa.UI.activity;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.net.Uri;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
@@ -30,7 +30,6 @@ import net.bjyfkj.caa.util.SharedPreferencesUtils;
 import org.xutils.x;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -52,7 +51,9 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
     private EditText device_id;
     private List<VideoData.DataBean> videolist;//服务器视频列表
     private List<Map<String, String>> sdlist = new ArrayList<Map<String, String>>();
-
+    private boolean isplayvideo = true;
+    private int position = 0;
+    private int playlistposition = 0;
 
     @Override
 
@@ -114,7 +115,7 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
     @Override
     public void getVideoPlayList(List<VideoData.DataBean> list) {
         videolist = list;
-        Toast.makeText(x.app(), "CAAlist - " + list.size(), Toast.LENGTH_SHORT).show();
+        Log.i("getVideoPlayList", "CAAlist - " + list.size());
         deviceDownLoadVideoPresenter.downLoadVideo();
     }
 
@@ -144,8 +145,14 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
     @Override
     public void downLoadSuccess() {
         Log.i("CAAdownLoadSuccess -- ", "下载成功");
-        deviceSdCardListPresenter.getSdCardVideoList();
-
+        if (playlistposition < videolist.size()) {
+            Toast.makeText(MainActivity.this, videolist.size() + "", Toast.LENGTH_SHORT).show();
+            playlistposition += 1;
+            deviceDownLoadVideoPresenter.downLoadVideo();
+        } else {
+            Log.i("getSdCardVideoList", "getSdCardVideoList");
+            deviceSdCardListPresenter.getSdCardVideoList();
+        }
     }
 
     //下载视频失败
@@ -155,13 +162,6 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
         deviceDownLoadVideoPresenter.downLoadVideo();
 
     }
-
-    //下载全部完成
-    @Override
-    public void downloadAll() {
-        deviceSdCardListPresenter.getSdCardVideoList();
-    }
-
 
     /**
      * EventBus 接收广播收到的信息
@@ -175,8 +175,8 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
 
     //拿到服务器视频列表去下载
     @Override
-    public List<VideoData.DataBean> VideoPlayList() {
-        return videolist;
+    public String VideoPlayPath() {
+        return videolist.get(position).getUrl();
     }
 
     @Override
@@ -207,23 +207,32 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
     //获取sdcard视频列表
     @Override
     public void getSdCardVideoList(List<Map<String, String>> list) {
-        sdlist.clear();
+        Log.i("asd", "获取sdcard视频列表");
+        sdlist = null;
         sdlist = list;
-        for (Map<String, String> stringStringMap : sdlist) {
-            Map<String, String> map = new HashMap<String, String>();
-            map = stringStringMap;
-            String path = map.get("path");
-            playVideo(path);
+        if (isplayvideo == true) {
+            playVideo();
         }
     }
 
     //播放视频
-    public void playVideo(String Path) {
+    public void playVideo() {
+        isplayvideo = false;
+        Map<String, String> map = sdlist.get(position);
+        position++;
+        final String Path = map.get("path");
         Log.i("CAAplayVideo -path ", Path + "");
-
-        Uri uri = Uri.parse(Path);
-        videoview.setVideoURI(uri);
+        videoview.setVideoPath(Path);
         videoview.start();
+        videoview.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                if (position >= sdlist.size()) {
+                    position = 0;
+                }
+                playVideo();
+            }
+        });
     }
 
 

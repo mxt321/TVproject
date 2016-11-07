@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center"
-    tools:context=".UI.activity.MainActivity">
+    tools:context=".UI.activity.MainActivity"
+    android:background="#000000">
 
     <VideoView
         android:id="@+id/videoview"

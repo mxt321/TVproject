@@ -1,5 +1,7 @@
 package net.bjyfkj.caa.mvp.biz;
 
+import net.bjyfkj.caa.util.SdCardUtil;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,11 +20,13 @@ public class DeviceSdCardBiz implements IDeviceSdCardBiz {
         File[] FileArray = file.listFiles();
         if (null != FileArray && 0 != FileArray.length) {
             for (int i = 0; i < FileArray.length; i++) {
-                Map<String, String> map = new HashMap<String, String>();
                 File files = FileArray[i];
-                map.put("name", files.getName() + "");
-                map.put("path", files.getPath() + "");
-                sdlist.add(map);
+                if (SdCardUtil.getFileType(files.getName()).equals(".mp4")) {
+                    Map<String, String> map = new HashMap<String, String>();
+                    map.put("name", files.getName() + "");
+                    map.put("path", files.getPath() + "");
+                    sdlist.add(map);
+                }
             }
             listener.getSdCardSuccess(sdlist);
         } else {
