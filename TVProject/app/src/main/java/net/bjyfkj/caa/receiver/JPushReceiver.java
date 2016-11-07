@@ -7,12 +7,16 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import net.bjyfkj.caa.eventBus.JPushEventBus;
+
 import cn.jpush.android.api.JPushInterface;
+import de.greenrobot.event.EventBus;
 
 /**
  * Created by YFKJ-1 on 2016/10/28.
  */
 public class JPushReceiver extends BroadcastReceiver {
+
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -25,9 +29,8 @@ public class JPushReceiver extends BroadcastReceiver {
             String content = bundle.getString(JPushInterface.EXTRA_MESSAGE);
             String extra = bundle.getString(JPushInterface.EXTRA_EXTRA);
             Log.i("收到了自定义消息@@消息内容是:", content + "");
-            Log.i("收到了自定义消息@@消息extra是", extra + "");
             Toast.makeText(context, "收到了自定义消息@@消息内容是:" + content, Toast.LENGTH_SHORT).show();
-            Toast.makeText(context, "收到了自定义消息@@消息extra是:" + extra, Toast.LENGTH_SHORT).show();
+            EventBus.getDefault().post(new JPushEventBus(content + ""));
         }
     }
 }

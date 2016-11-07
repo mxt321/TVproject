@@ -1,11 +1,15 @@
-package net.bjyfkj.caa.presenter;
+package net.bjyfkj.caa.mvp.presenter;
 
 import android.util.Log;
 
-import net.bjyfkj.caa.biz.DeviceLoginBiz;
-import net.bjyfkj.caa.biz.IDeviceLoginBiz;
-import net.bjyfkj.caa.biz.OnDeviceLoginLinsterenr;
-import net.bjyfkj.caa.view.IDeviceLoginView;
+import net.bjyfkj.caa.mvp.biz.DeviceLoginBiz;
+import net.bjyfkj.caa.mvp.biz.IDeviceLoginBiz;
+import net.bjyfkj.caa.mvp.biz.OnDeviceGetPlayListener;
+import net.bjyfkj.caa.mvp.biz.OnDeviceLoginListener;
+import net.bjyfkj.caa.entity.VideoData;
+import net.bjyfkj.caa.mvp.view.IDeviceLoginView;
+
+import java.util.List;
 
 
 /**
@@ -33,7 +37,7 @@ public class DeviceLoginPresenter {
                 loginProsenter(iDeviceLoginView.getDeviceId());
             }
         } else {
-            Log.i("getSPDevice_id", iDeviceLoginView.getSPDevice_id() + "");
+            Log.i("CAAP-getSPDevice_id", iDeviceLoginView.getSPDevice_id() + "");
             loginProsenter(iDeviceLoginView.getSPDevice_id());
         }
     }
@@ -42,7 +46,7 @@ public class DeviceLoginPresenter {
      * 登录
      */
     public void loginProsenter(String device_id) {
-        iDeviceLoginBiz.login(device_id, new OnDeviceLoginLinsterenr() {
+        iDeviceLoginBiz.login(device_id, new OnDeviceLoginListener() {
             @Override
             public void loginSuccess(String device_id, boolean islogin) {
                 iDeviceLoginView.isdialog(device_id, true);
@@ -56,13 +60,18 @@ public class DeviceLoginPresenter {
         });
     }
 
+    public void getVideoPlay() {
+        iDeviceLoginBiz.getVedioPlayList(iDeviceLoginView.getSPDevice_id().toString(), new OnDeviceGetPlayListener() {
+            @Override
+            public void loginSuccess(List<VideoData.DataBean> list) {
+                iDeviceLoginView.getVideoPlayList(list);
+            }
 
-    /***
-     * 退出登录
-     */
-    public void logout() {
+            @Override
+            public void loginFailed() {
 
+            }
+        });
     }
-
 
 }
