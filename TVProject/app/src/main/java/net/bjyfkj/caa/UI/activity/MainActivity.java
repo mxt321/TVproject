@@ -14,8 +14,6 @@ import android.widget.ImageView;
 import android.widget.MediaController;
 import android.widget.VideoView;
 
-import com.bumptech.glide.Glide;
-
 import net.bjyfkj.caa.R;
 import net.bjyfkj.caa.UI.adapter.CarouselPagerAdapter;
 import net.bjyfkj.caa.constant.LoginId;
@@ -23,7 +21,6 @@ import net.bjyfkj.caa.entity.VideoData;
 import net.bjyfkj.caa.eventBus.JPushEventBus;
 import net.bjyfkj.caa.model.CarouselViewPager;
 import net.bjyfkj.caa.model.Login;
-import net.bjyfkj.caa.model.MarqueeText;
 import net.bjyfkj.caa.model.ViewPagerScroller;
 import net.bjyfkj.caa.mvp.presenter.DeviceDownLoadVideoPresenter;
 import net.bjyfkj.caa.mvp.presenter.DeviceLoginPresenter;
@@ -50,12 +47,14 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
 
     @InjectView(R.id.videoview)
     VideoView videoview;
-    @InjectView(R.id.text1)
-    MarqueeText text1;
-    @InjectView(R.id.text2)
-    MarqueeText text2;
+    //    @InjectView(R.id.text1)
+//    MarqueeText text1;
+//    @InjectView(R.id.text2)
+//    MarqueeText text2;
     @InjectView(R.id.mCarouselView)
     CarouselViewPager mCarouselView;
+
+
     private AlertDialog.Builder builder;
     private View view;
     private DeviceLoginPresenter deviceLoginPresenter;
@@ -70,29 +69,31 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
 
 
     private List<ImageView> ivList = new ArrayList<ImageView>();
-    private String[] strimage = {"http://p1.wmpic.me/article/2015/12/17/1450342476_dXSlGANj.jpg", "http://f2.dn.anqu.com/down/YmU2Yg==/allimg/1402/54-14021G01218.jpg", "http://b.zol-img.com.cn/sjbizhi/images/8/320x510/1437447832609.jpg", "http://download.pchome.net/wallpaper/pic-4494-1-320x480.jpg"};
+    private int[] strimage = {R.drawable.a1024, R.drawable.a10241, R.drawable.a102430};
 
     @Override
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main1);
+        setContentView(R.layout.activity_main2);
         ButterKnife.inject(this);
         initData();
         init();
 
     }
 
+    /***
+     * 图片轮播
+     */
     private void initData() {
         for (int i = 0; i < strimage.length; i++) {
             ImageView iv = new ImageView(getApplicationContext());
-            Glide.with(getApplicationContext())
-                    .load(strimage[i])
-                    .into(iv);
+//            Glide.with(getApplicationContext())
+//                    .load(strimage[i])
+//                    .into(iv);
+            iv.setImageResource(strimage[i]);
             ivList.add(iv);
         }
-
-
         mCarouselView.setAdapter(new CarouselPagerAdapter(ivList));
         mCarouselView.setDisplayTime(20000);
         ViewPagerScroller scroller = new ViewPagerScroller(getApplicationContext());
@@ -135,8 +136,8 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
      * 初始化
      */
     public void init() {
-        text1.startScroll();
-        text2.startScroll();
+//        text1.startScroll();
+//        text2.startScroll();
         view = LayoutInflater.from(MainActivity.this).inflate(R.layout
                 .alert_view, null);
         videoview.setMediaController(new MediaController(this));

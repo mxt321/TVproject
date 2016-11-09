@@ -6,13 +6,18 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 
 /**
- * Created by YFKJ-1 on 2016/11/2.
+ * Created by YFKJ-1 on 2016/11/9.
  */
-public class JPushService extends Service {
+public class getAdsPlayListService extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         return null;
     }
 
+    @Override
+    public void onStart(Intent intent, int startId) {
+        super.onStart(intent, startId);
+
+    }
 }

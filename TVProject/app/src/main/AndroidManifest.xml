@@ -58,10 +58,6 @@
             </intent-filter>
         </receiver>
 
-        <service android:name=".service.JPushService">
-
-        </service>
-
         <!-- Required SDK 核心功能-->
         <!-- option since 2.0.5 可配置PushService，DaemonService,PushReceiver,AlarmReceiver的android:process参数 将JPush相关组件设置为一个独立进程 -->
         <!-- 如：android:process=":remote" -->
