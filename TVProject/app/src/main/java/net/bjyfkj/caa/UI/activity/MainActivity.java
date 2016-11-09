@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +24,7 @@ import net.bjyfkj.caa.eventBus.JPushEventBus;
 import net.bjyfkj.caa.model.CarouselViewPager;
 import net.bjyfkj.caa.model.Login;
 import net.bjyfkj.caa.model.MarqueeText;
+import net.bjyfkj.caa.model.ViewPagerScroller;
 import net.bjyfkj.caa.mvp.presenter.DeviceDownLoadVideoPresenter;
 import net.bjyfkj.caa.mvp.presenter.DeviceLoginPresenter;
 import net.bjyfkj.caa.mvp.presenter.DeviceSdCardListPresenter;
@@ -74,7 +76,7 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main1);
         ButterKnife.inject(this);
         initData();
         init();
@@ -92,7 +94,39 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
 
 
         mCarouselView.setAdapter(new CarouselPagerAdapter(ivList));
-        mCarouselView.setDisplayTime(5000);
+        mCarouselView.setDisplayTime(20000);
+        ViewPagerScroller scroller = new ViewPagerScroller(getApplicationContext());
+        scroller.setScrollDuration(5000);
+        scroller.initViewPagerScroll(mCarouselView);
+        mCarouselView.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                if (state == ViewPager.SCROLL_STATE_DRAGGING) {
+                    //正在滑动   pager处于正在拖拽中
+
+                    Log.d("测试代码", "onPageScrollStateChanged=======正在滑动" + "SCROLL_STATE_DRAGGING");
+
+                } else if (state == ViewPager.SCROLL_STATE_SETTLING) {
+                    //pager正在自动沉降，相当于松手后，pager恢复到一个完整pager的过程
+                    Log.d("测试代码", "onPageScrollStateChanged=======自动沉降" + "SCROLL_STATE_SETTLING");
+                    videoview.pause();
+                } else if (state == ViewPager.SCROLL_STATE_IDLE) {
+                    //空闲状态  pager处于空闲状态
+                    Log.d("测试代码", "onPageScrollStateChanged=======空闲状态" + "SCROLL_STATE_IDLE");
+                    videoview.start();
+                }
+            }
+        });
         mCarouselView.start();
 
     }
