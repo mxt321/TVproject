@@ -21,6 +21,7 @@ import net.bjyfkj.caa.R;
 import net.bjyfkj.caa.UI.adapter.CarouselPagerAdapter;
 import net.bjyfkj.caa.constant.LoginId;
 import net.bjyfkj.caa.entity.VideoData;
+import net.bjyfkj.caa.eventBus.GetAdsPlayListEventBus;
 import net.bjyfkj.caa.eventBus.JPushEventBus;
 import net.bjyfkj.caa.model.CarouselViewPager;
 import net.bjyfkj.caa.model.Login;
@@ -34,6 +35,7 @@ import net.bjyfkj.caa.mvp.view.IDeviceLoginView;
 import net.bjyfkj.caa.mvp.view.IDeviceSdCardView;
 import net.bjyfkj.caa.util.JPushUtil;
 import net.bjyfkj.caa.util.SharedPreferencesUtils;
+import net.bjyfkj.caa.util.getAdsPlayListUtil;
 
 import org.xutils.x;
 
@@ -47,6 +49,8 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import cn.jpush.android.api.JPushInterface;
 import de.greenrobot.event.EventBus;
+import de.greenrobot.event.Subscribe;
+import de.greenrobot.event.ThreadMode;
 
 public class MainActivity extends FragmentActivity implements IDeviceLoginView, IDeviceDownLoadVideoView, IDeviceSdCardView {
 
@@ -95,7 +99,6 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
 
     /***
      * timer定时器  开始
-     *
      */
     private void startTimer() {
         if (mTimer == null) {
@@ -253,6 +256,7 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
             JPushUtil.setAlias(x.app(), "d" + deviceid);
             deviceLoginPresenter.getVideoPlay();
             deviceLoginPresenter.updateDeviceTime();
+            getAdsPlayListUtil.getAdsPlayList();
         } else {
             builderShow();
         }
@@ -314,6 +318,7 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
      *
      * @param jpush
      */
+    @Subscribe(threadMode = ThreadMode.MainThread)
     public void onEventMainThread(JPushEventBus jpush) {
         Log.i("CAAonEventMainThread --", jpush.message.toString() + "");
         deviceLoginPresenter.getVideoPlay();
@@ -379,6 +384,12 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
                 playVideo();
             }
         });
+    }
+
+    @Subscribe(threadMode = ThreadMode.MainThread)
+    public void getAdsPlayList(GetAdsPlayListEventBus getAdsPlayListEventBus) {
+        Log.i("getAdsPlayList", getAdsPlayListEventBus.result + "");
+//        Toast.makeText(x.app(), getAdsPlayListEventBus.result + "", Toast.LENGTH_SHORT).show();
     }
 
 
