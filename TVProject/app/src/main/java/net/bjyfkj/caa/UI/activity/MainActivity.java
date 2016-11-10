@@ -25,7 +25,6 @@ import net.bjyfkj.caa.eventBus.GetAdsPlayListEventBus;
 import net.bjyfkj.caa.eventBus.JPushEventBus;
 import net.bjyfkj.caa.model.CarouselViewPager;
 import net.bjyfkj.caa.model.Login;
-import net.bjyfkj.caa.model.MarqueeText;
 import net.bjyfkj.caa.model.ViewPagerScroller;
 import net.bjyfkj.caa.mvp.presenter.DeviceDownLoadVideoPresenter;
 import net.bjyfkj.caa.mvp.presenter.DeviceLoginPresenter;
@@ -57,15 +56,10 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
 
     @InjectView(R.id.videoview)
     VideoView videoview;
-    @InjectView(R.id.text1)
-    MarqueeText text1;
-    @InjectView(R.id.text2)
-    MarqueeText text2;
     @InjectView(R.id.mCarouselView)
     CarouselViewPager mCarouselView;
     @InjectView(R.id.timer)
     TextView time;
-
 
     private AlertDialog.Builder builder;
     private View view;
@@ -216,8 +210,6 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
      * 初始化
      */
     public void init() {
-        text1.startScroll();
-        text2.startScroll();
         view = LayoutInflater.from(MainActivity.this).inflate(R.layout
                 .alert_view, null);
         videoview.setMediaController(new MediaController(this));
