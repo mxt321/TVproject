@@ -44,12 +44,12 @@
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true"
                     android:layout_marginBottom="10dp"
+                    android:background="#59000000"
                     android:gravity="center_vertical"
                     android:paddingLeft="100dp"
                     android:text="本视频由&quot;进魏美甲天虹百货店&quot;赞助播出 (本商场二层)"
                     android:textColor="#ff0000"
-                    android:textSize="28dp"
-                    android:background="#59000000" />
+                    android:textSize="28dp" />
             </RelativeLayout>
 
 
@@ -61,17 +61,52 @@
             android:layout_weight="5"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/text1"
+            <net.bjyfkj.caa.model.AlwaysMarqueeTextView
+                android:id="@+id/item_title"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:text="爱你有不同，美甲更轻松！"
-                android:textColor="@android:color/holo_red_dark"
+                android:ellipsize="marquee"
+                android:focusableInTouchMode="true"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:singleLine="true"
+                android:text="活动内容：甲油胶特价98元原价288元 包括【OPI基础护理一次价值50元 进巍自主品牌甲油胶一次价值238元】"
                 android:textSize="50dp"
-                android:textStyle="bold"
-                android:gravity="center"
-                android:fontFamily="@android:string/httpErrorUnsupportedScheme" />
+                android:gravity="center_vertical"
+                android:textColor="#ff0000" />
+
+            <net.bjyfkj.caa.model.AlwaysMarqueeTextView
+                android:id="@+id/led2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:singleLine="true"
+                android:text="活动地址：本商场二层电梯右侧"
+                android:textColor="#ff0000"
+                android:textSize="50dp" />
+
+
+            <!--<net.bjyfkj.caa.model.CustomTextView-->
+            <!--android:id="@+id/led1"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_weight="1"-->
+            <!--android:gravity="center_vertical"-->
+            <!--android:singleLine="true"-->
+            <!--android:textSize="50dp"-->
+            <!--android:textColor="#ff0000" />-->
+
+            <!--<net.bjyfkj.caa.model.CustomTextView-->
+            <!--android:id="@+id/led2"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_weight="1"-->
+            <!--android:gravity="center_vertical"-->
+            <!--android:singleLine="true"-->
+            <!--android:text="活动地址：本商场二层电梯右侧"-->
+            <!--android:textSize="50dp"-->
+            <!--android:textColor="#ff0000" />-->
 
         </LinearLayout>
     </LinearLayout>
@@ -82,21 +117,43 @@
         android:layout_weight="10"
         android:orientation="vertical">
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center_horizontal"
             android:layout_weight="3"
             android:orientation="horizontal">
 
-            <net.bjyfkj.caa.model.CarouselViewPager
-                android:id="@+id/mCarouselView"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-            </net.bjyfkj.caa.model.CarouselViewPager>
+                <net.bjyfkj.caa.model.CarouselViewPager
+                    android:id="@+id/mCarouselView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
 
-        </LinearLayout>
+                </net.bjyfkj.caa.model.CarouselViewPager>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/textView9"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_alignParentBottom="false"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:ellipsize="marquee"
+                android:gravity="center"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:singleLine="true"
+                android:text="美丽的指甲，是女孩的第二张名片!"
+                android:textColor="#ff0000"
+                android:textSize="28dp"
+                android:textStyle="bold" />
+
+        </RelativeLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -135,29 +192,31 @@
                     android:orientation="vertical">
 
                     <TextView
+                        android:id="@+id/textView6"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:text="免费面膜"
+                        android:textColor="#ff0000"
+                        android:textSize="25dp" />
+
+                    <TextView
                         android:id="@+id/textView7"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:gravity="bottom"
-                        android:paddingLeft="10dp"
-                        android:text="双十一5折券"
-                        android:textColor="@android:color/holo_red_dark"
-                        android:textSize="26dp"
-                        android:textStyle="bold" />
+                        android:text="扫码领取"
+                        android:textColor="#ff0000"
+                        android:textSize="25dp" />
 
                     <TextView
                         android:id="@+id/textView8"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:paddingLeft="10dp"
-                        android:text="扫描领取"
-                        android:textColor="@android:color/holo_red_dark"
-                        android:textSize="26dp"
-                        android:textStyle="bold"
-                        android:gravity="bottom" />
-
+                        android:text="数量有限"
+                        android:textColor="#ff0000"
+                        android:textSize="25dp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -174,7 +233,7 @@
                         android:layout_weight="1"
                         android:gravity="bottom"
                         android:paddingLeft="10dp"
-                        android:text="活动倒计时"
+                        android:text="活动时间"
                         android:textColor="@android:color/holo_red_dark"
                         android:textSize="26dp"
                         android:textStyle="bold" />
@@ -184,12 +243,12 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
+                        android:gravity="top"
+                        android:paddingLeft="40dp"
                         android:text="s"
                         android:textColor="@android:color/holo_red_dark"
                         android:textSize="40dp"
-                        android:textStyle="bold"
-                        android:gravity="top"
-                        android:paddingLeft="40dp" />
+                        android:textStyle="bold" />
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>

@@ -17,6 +17,8 @@ import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.VideoView;
 
+import com.bumptech.glide.Glide;
+
 import net.bjyfkj.caa.R;
 import net.bjyfkj.caa.UI.adapter.CarouselPagerAdapter;
 import net.bjyfkj.caa.constant.LoginId;
@@ -60,6 +62,17 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
     CarouselViewPager mCarouselView;
     @InjectView(R.id.timer)
     TextView time;
+//    @InjectView(R.id.led1)
+//    CustomTextView led1;
+//    @InjectView(R.id.led2)
+//    CustomTextView led2;
+    //    @InjectView(R.id.txt_title)
+//    TextView txtTitle;
+//    @InjectView(R.id.led1)
+//    MarqueeText led1;
+//    @InjectView(R.id.led2)
+//    MarqueeText led2;
+
 
     private AlertDialog.Builder builder;
     private View view;
@@ -74,11 +87,10 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
     private int playlistposition = 0;
     private int recLen = 0;//倒计时时间
     private List<ImageView> ivList = new ArrayList<ImageView>();
-    private int[] strimage = {R.drawable.a1024, R.drawable.a10241, R.drawable.a102430};
+    private int[] strimage = {R.drawable.a1, R.drawable.a2, R.drawable.a3};
     private static final int UPDATE_TEXTVIEW = 0;
     private Timer mTimer = null;
     private TimerTask mTimerTask = null;
-    private boolean isStop = true;
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -152,10 +164,10 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
         recLen = (strimage.length) * (20 + 5) - 5;
         for (int i = 0; i < strimage.length; i++) {
             ImageView iv = new ImageView(getApplicationContext());
-//            Glide.with(getApplicationContext())
-//                    .load(strimage[i])
-//                    .into(iv);
-            iv.setImageResource(strimage[i]);
+            Glide.with(getApplicationContext())
+                    .load(strimage[i])
+                    .into(iv);
+//            iv.setImageResource(strimage[i]);
             ivList.add(iv);
         }
 
@@ -203,6 +215,7 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
         });
         mCarouselView.start();
         startTimer();
+//        startanim();
     }
 
 
@@ -210,6 +223,15 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
      * 初始化
      */
     public void init() {
+//        String led1text = "活动内容：甲油胶特价98元原价288元 包括【OPI基础护理一次价值50元 进巍自主品牌甲油胶一次价值238元】";
+//        led1.init(getWindowManager());
+//        led1.setText(Html.fromHtml("<font color=\'#ff0000\'>" + led1text + ":</font>"));
+//        led1.startScroll();
+//        led1.setEnabled(false);
+//        led2.init(getWindowManager());
+//        led2.startScroll();
+//        led2.setEnabled(false);
+
         view = LayoutInflater.from(MainActivity.this).inflate(R.layout
                 .alert_view, null);
         videoview.setMediaController(new MediaController(this));
@@ -219,6 +241,75 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
         deviceSdCardListPresenter = new DeviceSdCardListPresenter(this);
         deviceLoginPresenter.login();
     }
+
+//    /***
+//     * 标题动画
+//     */
+//    public void startanim() {
+//        runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                txtTitle.setVisibility(View.VISIBLE);
+//                led1.stopScroll();
+//                led2.stopScroll();
+//                led1.setVisibility(View.GONE);
+//                led2.setVisibility(View.GONE);
+//                animation = AnimationUtils.loadAnimation(MainActivity.this, R.anim.fadein);
+//                animation.setAnimationListener(new Animation.AnimationListener() {
+//                    @Override
+//                    public void onAnimationStart(Animation animation) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onAnimationEnd(Animation animation) {
+//                        new Thread(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                try {
+//                                    Thread.sleep(15000);
+//                                } catch (InterruptedException e) {
+//                                    e.printStackTrace();
+//                                }
+//                                startLED();
+//                            }
+//                        }).start();
+//                    }
+//
+//                    @Override
+//                    public void onAnimationRepeat(Animation animation) {
+//
+//                    }
+//                });
+//                txtTitle.setAnimation(animation);
+//            }
+//        });
+//    }
+//
+//    public void startLED() {
+//        runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                txtTitle.setVisibility(View.GONE);
+//                led1.setVisibility(View.VISIBLE);
+//                led2.setVisibility(View.VISIBLE);
+//                led1.startScroll();
+//                led2.startScroll();
+//                new Thread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        try {
+//                            Thread.sleep(30000);
+//                        } catch (InterruptedException e) {
+//                            e.printStackTrace();
+//                        }
+//                        startanim();
+//                    }
+//                }).start();
+//
+//            }
+//        });
+//    }
 
     @Override
     public String getDeviceId() {
