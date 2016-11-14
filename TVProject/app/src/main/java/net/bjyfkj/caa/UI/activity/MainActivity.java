@@ -4,8 +4,6 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
@@ -22,9 +20,11 @@ import com.bumptech.glide.Glide;
 import net.bjyfkj.caa.R;
 import net.bjyfkj.caa.UI.adapter.CarouselPagerAdapter;
 import net.bjyfkj.caa.constant.LoginId;
+import net.bjyfkj.caa.entity.AdsPlayData;
 import net.bjyfkj.caa.entity.VideoData;
 import net.bjyfkj.caa.eventBus.GetAdsPlayListEventBus;
 import net.bjyfkj.caa.eventBus.JPushEventBus;
+import net.bjyfkj.caa.model.AlwaysMarqueeTextView;
 import net.bjyfkj.caa.model.CarouselViewPager;
 import net.bjyfkj.caa.model.Login;
 import net.bjyfkj.caa.model.ViewPagerScroller;
@@ -34,8 +34,11 @@ import net.bjyfkj.caa.mvp.presenter.DeviceSdCardListPresenter;
 import net.bjyfkj.caa.mvp.view.IDeviceDownLoadVideoView;
 import net.bjyfkj.caa.mvp.view.IDeviceLoginView;
 import net.bjyfkj.caa.mvp.view.IDeviceSdCardView;
+import net.bjyfkj.caa.service.getAdsPlayListService;
 import net.bjyfkj.caa.util.JPushUtil;
+import net.bjyfkj.caa.util.PollingUtils;
 import net.bjyfkj.caa.util.SharedPreferencesUtils;
+import net.bjyfkj.caa.util.StringUtil;
 import net.bjyfkj.caa.util.getAdsPlayListUtil;
 
 import org.xutils.x;
@@ -43,8 +46,6 @@ import org.xutils.x;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -60,18 +61,18 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
     VideoView videoview;
     @InjectView(R.id.mCarouselView)
     CarouselViewPager mCarouselView;
-    @InjectView(R.id.timer)
-    TextView time;
-//    @InjectView(R.id.led1)
-//    CustomTextView led1;
-//    @InjectView(R.id.led2)
-//    CustomTextView led2;
-    //    @InjectView(R.id.txt_title)
-//    TextView txtTitle;
-//    @InjectView(R.id.led1)
-//    MarqueeText led1;
-//    @InjectView(R.id.led2)
-//    MarqueeText led2;
+    @InjectView(R.id.flytxtview)
+    TextView flytxtview;
+    @InjectView(R.id.led1)
+    AlwaysMarqueeTextView led1;
+    @InjectView(R.id.led2)
+    AlwaysMarqueeTextView led2;
+    @InjectView(R.id.qrcode)
+    ImageView qrcode;
+    @InjectView(R.id.title)
+    TextView title;
+    @InjectView(R.id.content)
+    TextView content;
 
 
     private AlertDialog.Builder builder;
@@ -82,66 +83,13 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
     private EditText device_id;
     private List<VideoData.DataBean> videolist;//服务器视频列表
     private List<Map<String, String>> sdlist = new ArrayList<Map<String, String>>();
-    private boolean isplayvideo = true;
-    private int position = 0;
+    private boolean isplayvideo = true;//是否正在播放视频
+    private int videoposition = 0;//
     private int playlistposition = 0;
-    private int recLen = 0;//倒计时时间
-    private List<ImageView> ivList = new ArrayList<ImageView>();
-    private int[] strimage = {R.drawable.a1, R.drawable.a2, R.drawable.a3};
-    private static final int UPDATE_TEXTVIEW = 0;
-    private Timer mTimer = null;
-    private TimerTask mTimerTask = null;
-    private Handler handler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            switch (msg.what) {
-                case UPDATE_TEXTVIEW:
-                    time.setText(recLen + "s");
-                    break;
-            }
-        }
-    };
-
-    /***
-     * timer定时器  开始
-     */
-    private void startTimer() {
-        if (mTimer == null) {
-            mTimer = new Timer();
-        }
-        if (mTimerTask == null) {
-            mTimerTask = new TimerTask() {
-                @Override
-                public void run() {
-                    Message message = new Message();
-                    message.what = 0;
-                    handler.sendMessage(message);
-                    recLen--;
-                }
-            };
-        }
-
-        if (mTimer != null && mTimerTask != null)
-            mTimer.schedule(mTimerTask, 1000, 1000);
-
-    }
-
-    /***
-     * timer定时器  关闭
-     */
-    private void stopTimer() {
-
-        if (mTimer != null) {
-            mTimer.cancel();
-            mTimer = null;
-        }
-
-        if (mTimerTask != null) {
-            mTimerTask.cancel();
-            mTimerTask = null;
-        }
-    }
+    private int adsposition = 0;//广告下标
+    private List<ImageView> ivList = new ArrayList<ImageView>();//图片轮播控件列表
+    private List<AdsPlayData.DataBean> adslist;//广告列表
+    private boolean isRotation = false;//是否正在轮播
 
 
     @Override
@@ -150,7 +98,6 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main1);
         ButterKnife.inject(this);
-        initimager();
         init();
 
     }
@@ -158,19 +105,24 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
     /***
      * 图片轮播
      */
-    int ppp = 0;
+    int imageposition = 0;
 
     private void initimager() {
-        recLen = (strimage.length) * (20 + 5) - 5;
+        if (adsposition == adslist.size()) {
+            adsposition = 0;
+        }
+        final AdsPlayData.DataBean adsData = adslist.get(adsposition);
+        Glide.with(x.app()).load(adsData.getQrcode()).into(qrcode);
+        led1.setText(adsData.getShop_name());
+        led2.setText(adsData.getShop_address());
+        final String strimage[] = StringUtil.StringSplit(adsData.getImglist());
         for (int i = 0; i < strimage.length; i++) {
             ImageView iv = new ImageView(getApplicationContext());
             Glide.with(getApplicationContext())
                     .load(strimage[i])
                     .into(iv);
-//            iv.setImageResource(strimage[i]);
             ivList.add(iv);
         }
-
         mCarouselView.setAdapter(new CarouselPagerAdapter(ivList));
         mCarouselView.setDisplayTime(20000);
         ViewPagerScroller scroller = new ViewPagerScroller(getApplicationContext());
@@ -197,11 +149,10 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
                 } else if (state == ViewPager.SCROLL_STATE_SETTLING) {
                     //pager正在自动沉降，相当于松手后，pager恢复到一个完整pager的过程
                     Log.d("测试代码", "onPageScrollStateChanged=======自动沉降" + "SCROLL_STATE_SETTLING");
-                    ppp++;
-                    if (strimage.length == ppp) {
-//
-                        stopTimer();
-                        ppp = 0;
+                    imageposition++;
+                    if (strimage.length == imageposition) {
+                        imageposition = 0;
+                        adsposition++;
                         initimager();
                     } else {
                         videoview.pause();
@@ -214,8 +165,6 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
             }
         });
         mCarouselView.start();
-        startTimer();
-//        startanim();
     }
 
 
@@ -223,15 +172,7 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
      * 初始化
      */
     public void init() {
-//        String led1text = "活动内容：甲油胶特价98元原价288元 包括【OPI基础护理一次价值50元 进巍自主品牌甲油胶一次价值238元】";
-//        led1.init(getWindowManager());
-//        led1.setText(Html.fromHtml("<font color=\'#ff0000\'>" + led1text + ":</font>"));
-//        led1.startScroll();
-//        led1.setEnabled(false);
-//        led2.init(getWindowManager());
-//        led2.startScroll();
-//        led2.setEnabled(false);
-
+        PollingUtils.startPollingService(this, 3600, getAdsPlayListService.class, getAdsPlayListService.ACTION);
         view = LayoutInflater.from(MainActivity.this).inflate(R.layout
                 .alert_view, null);
         videoview.setMediaController(new MediaController(this));
@@ -242,74 +183,6 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
         deviceLoginPresenter.login();
     }
 
-//    /***
-//     * 标题动画
-//     */
-//    public void startanim() {
-//        runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//                txtTitle.setVisibility(View.VISIBLE);
-//                led1.stopScroll();
-//                led2.stopScroll();
-//                led1.setVisibility(View.GONE);
-//                led2.setVisibility(View.GONE);
-//                animation = AnimationUtils.loadAnimation(MainActivity.this, R.anim.fadein);
-//                animation.setAnimationListener(new Animation.AnimationListener() {
-//                    @Override
-//                    public void onAnimationStart(Animation animation) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onAnimationEnd(Animation animation) {
-//                        new Thread(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                try {
-//                                    Thread.sleep(15000);
-//                                } catch (InterruptedException e) {
-//                                    e.printStackTrace();
-//                                }
-//                                startLED();
-//                            }
-//                        }).start();
-//                    }
-//
-//                    @Override
-//                    public void onAnimationRepeat(Animation animation) {
-//
-//                    }
-//                });
-//                txtTitle.setAnimation(animation);
-//            }
-//        });
-//    }
-//
-//    public void startLED() {
-//        runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//                txtTitle.setVisibility(View.GONE);
-//                led1.setVisibility(View.VISIBLE);
-//                led2.setVisibility(View.VISIBLE);
-//                led1.startScroll();
-//                led2.startScroll();
-//                new Thread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        try {
-//                            Thread.sleep(30000);
-//                        } catch (InterruptedException e) {
-//                            e.printStackTrace();
-//                        }
-//                        startanim();
-//                    }
-//                }).start();
-//
-//            }
-//        });
-//    }
 
     @Override
     public String getDeviceId() {
@@ -410,7 +283,7 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
     //拿到服务器视频列表去下载
     @Override
     public String VideoPlayPath() {
-        return videolist.get(position).getUrl();
+        return videolist.get(videoposition).getUrl();
     }
 
     @Override
@@ -435,6 +308,7 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
     protected void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().unregister(this);
+        PollingUtils.stopPollingService(this, getAdsPlayListService.class, getAdsPlayListService.ACTION);
         Login.logout();
     }
 
@@ -452,8 +326,8 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
     //播放视频
     public void playVideo() {
         isplayvideo = false;
-        Map<String, String> map = sdlist.get(position);
-        position++;
+        Map<String, String> map = sdlist.get(videoposition);
+        videoposition++;
         final String Path = map.get("path");
         Log.i("CAAplayVideo -path ", Path + "");
         videoview.setVideoPath(Path);
@@ -461,8 +335,8 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
         videoview.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
-                if (position >= sdlist.size()) {
-                    position = 0;
+                if (videoposition >= sdlist.size()) {
+                    videoposition = 0;
                 }
                 playVideo();
             }
@@ -471,8 +345,11 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
 
     @Subscribe(threadMode = ThreadMode.MainThread)
     public void getAdsPlayList(GetAdsPlayListEventBus getAdsPlayListEventBus) {
-        Log.i("getAdsPlayList", getAdsPlayListEventBus.result + "");
-//        Toast.makeText(x.app(), getAdsPlayListEventBus.result + "", Toast.LENGTH_SHORT).show();
+        adslist = getAdsPlayListEventBus.result;
+        if (!isRotation) {
+            isRotation = true;
+            initimager();
+        }
     }
 
 

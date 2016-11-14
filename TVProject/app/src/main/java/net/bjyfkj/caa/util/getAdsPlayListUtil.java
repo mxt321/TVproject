@@ -1,11 +1,18 @@
 package net.bjyfkj.caa.util;
 
+import android.util.Log;
+
 import net.bjyfkj.caa.constant.LoginId;
+import net.bjyfkj.caa.entity.AdsPlayData;
 import net.bjyfkj.caa.eventBus.GetAdsPlayListEventBus;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.xutils.common.Callback;
 import org.xutils.http.RequestParams;
 import org.xutils.x;
+
+import java.util.List;
 
 import de.greenrobot.event.EventBus;
 
@@ -25,7 +32,22 @@ public class getAdsPlayListUtil {
         x.http().get(params, new Callback.CommonCallback<String>() {
             @Override
             public void onSuccess(String result) {
-                EventBus.getDefault().post(new GetAdsPlayListEventBus(result));
+                Log.i("getAdsPlayList", result + "");
+                try {
+                    JSONObject json = new JSONObject(result);
+                    int status = json.getInt("status");
+                    if (status == 1) {
+                        AdsPlayData adsPlayData = GsonUtils.json2Bean(result, AdsPlayData.class);
+                        List<AdsPlayData.DataBean> adslist = adsPlayData.getData();
+                        Log.i("adslist", adslist.size() + "");
+                        EventBus.getDefault().post(new GetAdsPlayListEventBus(adslist));
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
+//                EventBus.getDefault().post(new GetAdsPlayListEventBus(result));
             }
 
             @Override

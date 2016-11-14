@@ -49,6 +49,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        //轮询服务
+        <service android:name=".service.getAdsPlayListService">
+            <intent-filter>
+                <action android:name="net.bjyfkj.caa.getAdsPlayListService"></action>
+            </intent-filter>
+        </service>
 
         //开机自启动广播
         <receiver android:name=".receiver.StartActivityReceiver">

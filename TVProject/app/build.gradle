@@ -34,7 +34,6 @@ dependencies {
     compile 'com.android.support:appcompat-v7:25.0.0'
     compile 'org.xutils:xutils:3.3.36'
     compile 'com.google.code.gson:gson:2.7'
-    compile 'com.facebook.fresco:fresco:0.11.0'
     compile files('libs/jpush-android-2.2.0.jar')
     compile 'com.jakewharton:butterknife:5.1.1'
     compile 'de.greenrobot:eventbus:3.0.0-beta1'
