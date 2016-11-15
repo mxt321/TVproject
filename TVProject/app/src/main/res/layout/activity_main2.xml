@@ -43,8 +43,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_gravity="center_vertical"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/code" />
+                    android:scaleType="centerCrop" />
             </LinearLayout>
 
             <LinearLayout
@@ -126,9 +125,9 @@
                 <net.bjyfkj.caa.model.VerticalScrollTextView
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
+                    android:text="活动详情：1、做美甲免费做美甲护理2、体验免费做一个指甲"
                     android:textColor="#ff0000"
                     android:textSize="28dp"
-                    android:text="活动详情：1、做美甲免费做美甲护理2、体验免费做一个指甲"
                     android:textStyle="bold"></net.bjyfkj.caa.model.VerticalScrollTextView>
             </LinearLayout>
         </LinearLayout>

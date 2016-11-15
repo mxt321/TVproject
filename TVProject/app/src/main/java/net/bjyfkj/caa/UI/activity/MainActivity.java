@@ -111,7 +111,8 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
         if (adsposition == adslist.size()) {
             adsposition = 0;
         }
-        final AdsPlayData.DataBean adsData = adslist.get(adsposition);
+        final AdsPlayData.DataBean adsData = adslist.get(adsposition);//
+        getAdsPlayListUtil.setPlayCount(adsData.getId());//广告自增
         Glide.with(x.app()).load(adsData.getQrcode()).into(qrcode);
         led1.setText(adsData.getShop_name());
         led2.setText(adsData.getShop_address());

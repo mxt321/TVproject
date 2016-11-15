@@ -14,10 +14,10 @@ public class StringUtil {
     public static String[] StringSplit(String str) {
         String[] strs = str.split(",");
         for (int i = 0, len = strs.length; i < len; i++) {
-            System.out.println(strs[i].toString());
+//            System.out.println(strs[i].toString());
             strs[i] = strs[i].substring(strs[i].indexOf("\"") + 1, strs[i].indexOf("g") + 1);
             strs[i] = strs[i].replace("\\", "");
-            System.out.println(strs[i].toString());
+//            System.out.println(strs[i].toString());
         }
         return strs;
     }

@@ -45,9 +45,38 @@ public class getAdsPlayListUtil {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+            }
 
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
 
-//                EventBus.getDefault().post(new GetAdsPlayListEventBus(result));
+            }
+
+            @Override
+            public void onCancelled(CancelledException cex) {
+
+            }
+
+            @Override
+            public void onFinished() {
+
+            }
+        });
+    }
+
+    /***
+     * @param adsid
+     */
+    public static void setPlayCount(int adsid) {
+        String sign = MD5Util.encrypt("Device" + MD5Util.encrypt("bjyfkj4006010136") + "setPlayCount");
+        RequestParams params = new RequestParams(PropertiesUtils.getpath("setPlayCount"));
+        params.addBodyParameter("sign", sign);
+        params.addBodyParameter("device_id", SharedPreferencesUtils.getParam(x.app(), LoginId.DEVICELOGINSTATE, "").toString());
+        params.addBodyParameter("ads_id", adsid + "");
+        x.http().post(params, new Callback.CommonCallback<String>() {
+            @Override
+            public void onSuccess(String result) {
+                Log.i("setPlayCount", result + "");
             }
 
             @Override

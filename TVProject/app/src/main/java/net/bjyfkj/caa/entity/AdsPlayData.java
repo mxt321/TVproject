@@ -29,6 +29,9 @@ public class AdsPlayData {
     }
 
     public static class DataBean {
+        private int id;
+
+
         private String time;
         private String type;
         private String title;
@@ -37,6 +40,14 @@ public class AdsPlayData {
         private String shop_name;
         private String shop_address;
         private String qrcode;
+
+        public int getId() {
+            return id;
+        }
+
+        public void setId(int id) {
+            this.id = id;
+        }
 
         public String getTime() {
             return time;
