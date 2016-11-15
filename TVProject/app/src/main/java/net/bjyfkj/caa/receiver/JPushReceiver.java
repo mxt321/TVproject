@@ -8,8 +8,9 @@ import android.util.Log;
 
 import net.bjyfkj.caa.eventBus.JPushEventBus;
 
+import org.greenrobot.eventbus.EventBus;
+
 import cn.jpush.android.api.JPushInterface;
-import de.greenrobot.event.EventBus;
 
 /**
  * Created by YFKJ-1 on 2016/10/28.

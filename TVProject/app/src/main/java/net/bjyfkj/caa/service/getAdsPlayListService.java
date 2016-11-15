@@ -3,6 +3,7 @@ package net.bjyfkj.caa.service;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
+import android.util.Log;
 
 import net.bjyfkj.caa.util.getAdsPlayListUtil;
 
@@ -38,6 +39,7 @@ public class getAdsPlayListService extends Service {
     class PollingThread extends Thread {
         @Override
         public void run() {
+            Log.i("PollingThread", "PollingThread执行了");
             getAdsPlayListUtil.getAdsPlayList();
         }
     }

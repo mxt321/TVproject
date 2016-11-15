@@ -6,6 +6,7 @@ import net.bjyfkj.caa.constant.LoginId;
 import net.bjyfkj.caa.entity.AdsPlayData;
 import net.bjyfkj.caa.eventBus.GetAdsPlayListEventBus;
 
+import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.xutils.common.Callback;
@@ -14,7 +15,6 @@ import org.xutils.x;
 
 import java.util.List;
 
-import de.greenrobot.event.EventBus;
 
 /**
  * Created by YFKJ-1 on 2016/11/10.
@@ -38,9 +38,9 @@ public class getAdsPlayListUtil {
                     int status = json.getInt("status");
                     if (status == 1) {
                         AdsPlayData adsPlayData = GsonUtils.json2Bean(result, AdsPlayData.class);
-                        List<AdsPlayData.DataBean> adslist = adsPlayData.getData();
-                        Log.i("adslist", adslist.size() + "");
-                        EventBus.getDefault().post(new GetAdsPlayListEventBus(adslist));
+                        List<AdsPlayData.DataBean> list = adsPlayData.getData();
+                        Log.i("adslist", list.size() + "");
+                        EventBus.getDefault().post(new GetAdsPlayListEventBus(list));
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();

@@ -7,6 +7,7 @@ import android.widget.ImageView;
 
 import java.util.List;
 
+
 /**
  * @Author: pyz
  * @Package: com.pyz.viewpagerdemo.adapter
@@ -24,6 +25,9 @@ public class CarouselPagerAdapter extends PagerAdapter {
 
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
+        if (ivList.get(position % ivList.size()).getParent() != null) {
+            container.removeView(ivList.get(position % ivList.size()));
+        }
         container.addView(ivList.get(position % ivList.size()));
         return ivList.get(position % ivList.size());
     }

@@ -6,7 +6,7 @@ import net.bjyfkj.caa.entity.VideoData;
 import net.bjyfkj.caa.util.GsonUtils;
 import net.bjyfkj.caa.util.MD5Util;
 import net.bjyfkj.caa.util.PropertiesUtils;
-import net.bjyfkj.caa.util.UpdateTimeUtil;
+import net.bjyfkj.caa.util.TimeUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -123,7 +123,7 @@ public class DeviceLoginBiz implements IDeviceLoginBiz {
                     if (jsonInt == 1) {
                         JSONObject jsonObject1 = new JSONObject(jsonObject.get("data").toString());
                         String datetime = jsonObject1.getString("datetime");
-                        UpdateTimeUtil.testDate(datetime);
+                        TimeUtil.testDate(datetime);
                         Log.i("datetime", datetime + "");
                         listener.updateSuccess();
                     } else {

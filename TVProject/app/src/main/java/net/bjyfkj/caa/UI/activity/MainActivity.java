@@ -39,8 +39,12 @@ import net.bjyfkj.caa.util.JPushUtil;
 import net.bjyfkj.caa.util.PollingUtils;
 import net.bjyfkj.caa.util.SharedPreferencesUtils;
 import net.bjyfkj.caa.util.StringUtil;
+import net.bjyfkj.caa.util.TimeUtil;
 import net.bjyfkj.caa.util.getAdsPlayListUtil;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.xutils.x;
 
 import java.util.ArrayList;
@@ -50,9 +54,6 @@ import java.util.Map;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import cn.jpush.android.api.JPushInterface;
-import de.greenrobot.event.EventBus;
-import de.greenrobot.event.Subscribe;
-import de.greenrobot.event.ThreadMode;
 
 public class MainActivity extends FragmentActivity implements IDeviceLoginView, IDeviceDownLoadVideoView, IDeviceSdCardView {
 
@@ -87,10 +88,11 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
     private int videoposition = 0;//
     private int playlistposition = 0;
     private int adsposition = 0;//广告下标
-    private List<ImageView> ivList = new ArrayList<ImageView>();//图片轮播控件列表
+    private List<ImageView> ivList;//图片轮播控件列表
     private List<AdsPlayData.DataBean> adslist;//广告列表
     private boolean isRotation = false;//是否正在轮播
-
+    private String strimage[] = null;//轮播图片列表
+    private CarouselPagerAdapter carouselPagerAdapter;
 
     @Override
 
@@ -103,20 +105,51 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
     }
 
     /***
+     * 初始化
+     */
+    public void init() {
+
+        PollingUtils.startPollingService(this, 3600, getAdsPlayListService.class, getAdsPlayListService.ACTION);
+        view = LayoutInflater.from(MainActivity.this).inflate(R.layout
+                .alert_view, null);
+        videoview.setMediaController(new MediaController(this));
+        device_id = (EditText) view.findViewById(R.id.edt_userid);
+        deviceLoginPresenter = new DeviceLoginPresenter(this);
+        deviceDownLoadVideoPresenter = new DeviceDownLoadVideoPresenter(this);
+        deviceSdCardListPresenter = new DeviceSdCardListPresenter(this);
+        deviceLoginPresenter.updateDeviceTime();
+        deviceLoginPresenter.login();
+    }
+
+    /***
      * 图片轮播
      */
     int imageposition = 0;
 
     private void initimager() {
+        if (strimage != null) {
+            strimage = null;
+        }
+        if (carouselPagerAdapter != null) {
+            carouselPagerAdapter = null;
+        }
         if (adsposition == adslist.size()) {
             adsposition = 0;
         }
-        final AdsPlayData.DataBean adsData = adslist.get(adsposition);//
+        if (ivList != null) {
+            ivList = null;
+        }
+        final AdsPlayData.DataBean adsData = adslist.get(adsposition);//广告数据
+        if (!TimeUtil.initWeclomeText().equals(adsData.getType())) {
+            adsposition++;
+            initimager();
+        }
         getAdsPlayListUtil.setPlayCount(adsData.getId());//广告自增
         Glide.with(x.app()).load(adsData.getQrcode()).into(qrcode);
         led1.setText(adsData.getShop_name());
         led2.setText(adsData.getShop_address());
-        final String strimage[] = StringUtil.StringSplit(adsData.getImglist());
+        ivList = new ArrayList<ImageView>();
+        strimage = StringUtil.StringSplit(adsData.getImglist());
         for (int i = 0; i < strimage.length; i++) {
             ImageView iv = new ImageView(getApplicationContext());
             Glide.with(getApplicationContext())
@@ -124,7 +157,8 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
                     .into(iv);
             ivList.add(iv);
         }
-        mCarouselView.setAdapter(new CarouselPagerAdapter(ivList));
+        carouselPagerAdapter = new CarouselPagerAdapter(ivList);
+        mCarouselView.setAdapter(carouselPagerAdapter);
         mCarouselView.setDisplayTime(20000);
         ViewPagerScroller scroller = new ViewPagerScroller(getApplicationContext());
         scroller.setScrollDuration(5000);
@@ -169,22 +203,6 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
     }
 
 
-    /***
-     * 初始化
-     */
-    public void init() {
-        PollingUtils.startPollingService(this, 3600, getAdsPlayListService.class, getAdsPlayListService.ACTION);
-        view = LayoutInflater.from(MainActivity.this).inflate(R.layout
-                .alert_view, null);
-        videoview.setMediaController(new MediaController(this));
-        device_id = (EditText) view.findViewById(R.id.edt_userid);
-        deviceLoginPresenter = new DeviceLoginPresenter(this);
-        deviceDownLoadVideoPresenter = new DeviceDownLoadVideoPresenter(this);
-        deviceSdCardListPresenter = new DeviceSdCardListPresenter(this);
-        deviceLoginPresenter.login();
-    }
-
-
     @Override
     public String getDeviceId() {
         return device_id.getText().toString();
@@ -212,7 +230,6 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
             SharedPreferencesUtils.setParam(x.app(), LoginId.DEVICELOGINSTATE, deviceid + "");
             JPushUtil.setAlias(x.app(), "d" + deviceid);
             deviceLoginPresenter.getVideoPlay();
-            deviceLoginPresenter.updateDeviceTime();
             getAdsPlayListUtil.getAdsPlayList();
         } else {
             builderShow();
@@ -275,7 +292,7 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
      *
      * @param jpush
      */
-    @Subscribe(threadMode = ThreadMode.MainThread)
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(JPushEventBus jpush) {
         Log.i("CAAonEventMainThread --", jpush.message.toString() + "");
         deviceLoginPresenter.getVideoPlay();
@@ -344,7 +361,7 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
         });
     }
 
-    @Subscribe(threadMode = ThreadMode.MainThread)
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void getAdsPlayList(GetAdsPlayListEventBus getAdsPlayListEventBus) {
         adslist = getAdsPlayListEventBus.result;
         if (!isRotation) {
