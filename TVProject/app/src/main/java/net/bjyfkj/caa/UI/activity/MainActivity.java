@@ -109,7 +109,7 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
      */
     public void init() {
 
-        PollingUtils.startPollingService(this, 3600, getAdsPlayListService.class, getAdsPlayListService.ACTION);
+        PollingUtils.startPollingService(this, 300, getAdsPlayListService.class, getAdsPlayListService.ACTION);
         view = LayoutInflater.from(MainActivity.this).inflate(R.layout
                 .alert_view, null);
         videoview.setMediaController(new MediaController(this));
@@ -146,6 +146,8 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
         }
         getAdsPlayListUtil.setPlayCount(adsData.getId());//广告自增
         Glide.with(x.app()).load(adsData.getQrcode()).into(qrcode);
+        title.setText(adsData.getTitle());
+        content.setText(adsData.getContent());
         led1.setText(adsData.getShop_name());
         led2.setText(adsData.getShop_address());
         ivList = new ArrayList<ImageView>();

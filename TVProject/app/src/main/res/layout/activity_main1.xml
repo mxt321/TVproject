@@ -101,7 +101,6 @@
                 android:marqueeRepeatLimit="marquee_forever"
                 android:scrollHorizontally="true"
                 android:singleLine="true"
-                android:text="活动内容：甲油胶特价98元原价288元 包括【OPI基础护理一次价值50元 进巍自主品牌甲油胶一次价值238元】 "
                 android:textColor="@android:color/holo_red_dark"
                 android:textSize="50dp" />
 
@@ -118,7 +117,6 @@
                 android:marqueeRepeatLimit="marquee_forever"
                 android:scrollHorizontally="true"
                 android:singleLine="true"
-                android:text="活动地址：本商场二层电梯右侧"
                 android:textColor="@android:color/holo_red_dark"
                 android:textSize="50dp" />
         </LinearLayout>
@@ -193,7 +191,6 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center_vertical"
-                        android:text="每天30片"
                         android:textColor="@android:color/holo_red_dark"
                         android:textSize="25dp"
                         android:textStyle="bold" />
@@ -213,7 +210,6 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center_vertical"
-                        android:text="活动日期"
                         android:textColor="@android:color/holo_red_dark"
                         android:textSize="25dp"
                         android:textStyle="bold" />
