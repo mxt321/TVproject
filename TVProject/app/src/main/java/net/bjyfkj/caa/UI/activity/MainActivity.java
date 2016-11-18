@@ -1,10 +1,10 @@
 package net.bjyfkj.caa.UI.activity;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -24,7 +24,6 @@ import net.bjyfkj.caa.entity.AdsPlayData;
 import net.bjyfkj.caa.entity.VideoData;
 import net.bjyfkj.caa.eventBus.GetAdsPlayListEventBus;
 import net.bjyfkj.caa.eventBus.JPushEventBus;
-import net.bjyfkj.caa.model.AlwaysMarqueeTextView;
 import net.bjyfkj.caa.model.CarouselViewPager;
 import net.bjyfkj.caa.model.Login;
 import net.bjyfkj.caa.model.ViewPagerScroller;
@@ -39,7 +38,6 @@ import net.bjyfkj.caa.util.JPushUtil;
 import net.bjyfkj.caa.util.PollingUtils;
 import net.bjyfkj.caa.util.SharedPreferencesUtils;
 import net.bjyfkj.caa.util.StringUtil;
-import net.bjyfkj.caa.util.TimeUtil;
 import net.bjyfkj.caa.util.getAdsPlayListUtil;
 
 import org.greenrobot.eventbus.EventBus;
@@ -55,7 +53,7 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import cn.jpush.android.api.JPushInterface;
 
-public class MainActivity extends FragmentActivity implements IDeviceLoginView, IDeviceDownLoadVideoView, IDeviceSdCardView {
+public class MainActivity extends Activity implements IDeviceLoginView, IDeviceDownLoadVideoView, IDeviceSdCardView {
 
 
     @InjectView(R.id.videoview)
@@ -64,16 +62,10 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
     CarouselViewPager mCarouselView;
     @InjectView(R.id.flytxtview)
     TextView flytxtview;
-    @InjectView(R.id.led1)
-    AlwaysMarqueeTextView led1;
-    @InjectView(R.id.led2)
-    AlwaysMarqueeTextView led2;
+    @InjectView(R.id.shop_address)
+    TextView shopAddress;
     @InjectView(R.id.qrcode)
     ImageView qrcode;
-    @InjectView(R.id.title)
-    TextView title;
-    @InjectView(R.id.content)
-    TextView content;
 
 
     private AlertDialog.Builder builder;
@@ -109,7 +101,7 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
      */
     public void init() {
 
-        PollingUtils.startPollingService(this, 300, getAdsPlayListService.class, getAdsPlayListService.ACTION);
+        PollingUtils.startPollingService(this, 3600, getAdsPlayListService.class, getAdsPlayListService.ACTION);
         view = LayoutInflater.from(MainActivity.this).inflate(R.layout
                 .alert_view, null);
         videoview.setMediaController(new MediaController(this));
@@ -140,16 +132,13 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
             ivList = null;
         }
         final AdsPlayData.DataBean adsData = adslist.get(adsposition);//广告数据
-        if (!TimeUtil.initWeclomeText().equals(adsData.getType())) {
-            adsposition++;
-            initimager();
-        }
+//        if (!TimeUtil.initWeclomeText().equals(adsData.getType())) {
+//            adsposition++;
+//            initimager();
+//        } else {
         getAdsPlayListUtil.setPlayCount(adsData.getId());//广告自增
         Glide.with(x.app()).load(adsData.getQrcode()).into(qrcode);
-        title.setText(adsData.getTitle());
-        content.setText(adsData.getContent());
-        led1.setText(adsData.getShop_name());
-        led2.setText(adsData.getShop_address());
+        shopAddress.setText(adsData.getShop_address());
         ivList = new ArrayList<ImageView>();
         strimage = StringUtil.StringSplit(adsData.getImglist());
         for (int i = 0; i < strimage.length; i++) {
@@ -159,7 +148,12 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
                     .into(iv);
             ivList.add(iv);
         }
+
         carouselPagerAdapter = new CarouselPagerAdapter(ivList);
+        int width = mCarouselView.getWidth();
+        int height = mCarouselView.getHeight();
+        Log.i("width", width + "");
+        Log.i("height", height + "");
         mCarouselView.setAdapter(carouselPagerAdapter);
         mCarouselView.setDisplayTime(20000);
         ViewPagerScroller scroller = new ViewPagerScroller(getApplicationContext());
@@ -180,11 +174,9 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
             public void onPageScrollStateChanged(int state) {
                 if (state == ViewPager.SCROLL_STATE_DRAGGING) {
                     //正在滑动   pager处于正在拖拽中
-
                     Log.d("测试代码", "onPageScrollStateChanged=======正在滑动" + "SCROLL_STATE_DRAGGING");
-
                 } else if (state == ViewPager.SCROLL_STATE_SETTLING) {
-                    //pager正在自动沉降，相当于松手后，pager恢复到一个完整pager的过程
+                    //pager 正在自动沉降，相当于松手后，pager恢复到一个完整pager的过程
                     Log.d("测试代码", "onPageScrollStateChanged=======自动沉降" + "SCROLL_STATE_SETTLING");
                     imageposition++;
                     if (strimage.length == imageposition) {
@@ -202,6 +194,7 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
             }
         });
         mCarouselView.start();
+//    }
     }
 
 
@@ -249,6 +242,7 @@ public class MainActivity extends FragmentActivity implements IDeviceLoginView, 
     /***
      * 弹出输入框
      */
+
     public void builderShow() {
         SharedPreferencesUtils.setParam(x.app(), LoginId.DEVICELOGINSTATE, "");
         view = LayoutInflater.from(MainActivity.this).inflate(R.layout

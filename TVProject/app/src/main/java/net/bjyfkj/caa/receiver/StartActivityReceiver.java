@@ -15,7 +15,6 @@ public class StartActivityReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent.getAction().equals(action_boot)) {
-//            Toast.makeText(x.app(), "开机了", Toast.LENGTH_SHORT).show();
             Intent StartIntent = new Intent(context, MainActivity.class); //接收到广播后，跳转到MainActivity
             StartIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(StartIntent);

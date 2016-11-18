@@ -53,7 +53,7 @@
                     android:scrollHorizontally="true"
                     android:singleLine="true"
                     android:text="本视频由&quot;樊文花面膜天虹百货商场店&quot;特约播出 (本商场二层西侧)"
-                    android:textColor="#ff0000"
+                    android:textColor="@android:color/holo_red_dark"
                     android:textSize="28dp" />
             </RelativeLayout>
 
@@ -67,58 +67,46 @@
             android:orientation="vertical">
 
 
-            <!--<net.bjyfkj.caa.model.CustomTextView-->
-            <!--android:id="@+id/led1"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="match_parent"-->
-            <!--android:layout_weight="1"-->
-            <!--android:gravity="center_vertical"-->
-            <!--android:singleLine="true"-->
-            <!--android:textSize="50dp"-->
-            <!--android:textColor="#ff0000" />-->
+            <!--<net.bjyfkj.caa.model.AlwaysMarqueeTextView-->
+                <!--android:id="@+id/led1"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="match_parent"-->
+                <!--android:layout_weight="1"-->
+                <!--android:ellipsize="marquee"-->
+                <!--android:focusable="true"-->
+                <!--android:focusableInTouchMode="true"-->
+                <!--android:gravity="center_vertical"-->
+                <!--android:lines="1"-->
+                <!--android:marqueeRepeatLimit="marquee_forever"-->
+                <!--android:scrollHorizontally="true"-->
+                <!--android:singleLine="true"-->
+                <!--android:textColor="@android:color/holo_red_dark"-->
+                <!--android:textSize="50dp" />-->
 
-            <!--<net.bjyfkj.caa.model.CustomTextView-->
-            <!--android:id="@+id/led2"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="match_parent"-->
-            <!--android:layout_weight="1"-->
-            <!--android:gravity="center_vertical"-->
-            <!--android:singleLine="true"-->
-            <!--android:text="活动地址：本商场二层电梯右侧"-->
-            <!--android:textSize="50dp"-->
-            <!--android:textColor="#ff0000" />-->
-
-            <net.bjyfkj.caa.model.AlwaysMarqueeTextView
-                android:id="@+id/led1"
+            <!--<net.bjyfkj.caa.model.AlwaysMarqueeTextView-->
+                <!--android:id="@+id/led2"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="match_parent"-->
+                <!--android:layout_weight="1"-->
+                <!--android:ellipsize="marquee"-->
+                <!--android:focusable="true"-->
+                <!--android:focusableInTouchMode="true"-->
+                <!--android:gravity="center_vertical"-->
+                <!--android:lines="1"-->
+                <!--android:marqueeRepeatLimit="marquee_forever"-->
+                <!--android:scrollHorizontally="true"-->
+                <!--android:singleLine="true"-->
+                <!--android:textColor="@android:color/holo_red_dark"-->
+                <!--android:textSize="50dp" />-->
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:ellipsize="marquee"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                android:gravity="center_vertical"
-                android:lines="1"
-                android:marqueeRepeatLimit="marquee_forever"
-                android:scrollHorizontally="true"
-                android:singleLine="true"
+                android:id="@+id/shop_address"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center"
+                android:textSize="50dp"
                 android:textColor="@android:color/holo_red_dark"
-                android:textSize="50dp" />
-
-            <net.bjyfkj.caa.model.AlwaysMarqueeTextView
-                android:id="@+id/led2"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:ellipsize="marquee"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                android:gravity="center_vertical"
-                android:lines="1"
-                android:marqueeRepeatLimit="marquee_forever"
-                android:scrollHorizontally="true"
-                android:singleLine="true"
-                android:textColor="@android:color/holo_red_dark"
-                android:textSize="50dp" />
+                android:text="雾霾天，扫码免费送口罩" />
         </LinearLayout>
     </LinearLayout>
 
@@ -148,6 +136,13 @@
 
             </LinearLayout>
 
+            <RelativeLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+            </RelativeLayout>
+
         </RelativeLayout>
 
         <LinearLayout
@@ -161,8 +156,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center_horizontal"
-                android:layout_weight="4"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:layout_weight="4">
 
                 <ImageView
                     android:id="@+id/qrcode"
@@ -177,7 +172,8 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="center_horizontal"
                 android:layout_weight="5"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="gone">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -186,7 +182,7 @@
                     android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/title"
+                        android:id="@+id/content"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
@@ -205,17 +201,48 @@
                     android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/content"
+                        android:id="@+id/title"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center_vertical"
                         android:textColor="@android:color/holo_red_dark"
                         android:textSize="25dp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:text="微信扫一扫\n优惠马上用" />
 
                 </LinearLayout>
             </LinearLayout>
+
+            <RelativeLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="5">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/imageView2"
+                    android:layout_above="@+id/textView5"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:src="@drawable/masks" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="扫码送口罩"
+                    android:gravity="center"
+                    android:textSize="25dp"
+                    android:textColor="@android:color/holo_red_dark"
+                    android:layout_gravity="bottom"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:id="@+id/textView5" />
+            </RelativeLayout>
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>

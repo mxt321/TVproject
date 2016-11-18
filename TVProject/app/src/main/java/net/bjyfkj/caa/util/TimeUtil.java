@@ -1,6 +1,7 @@
 package net.bjyfkj.caa.util;
 
 import android.text.format.Time;
+import android.util.Log;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -14,6 +15,7 @@ public class TimeUtil {
      */
     public static void testDate(String time) {
         try {
+            Log.i("time", time + "");
             Process process = Runtime.getRuntime().exec("su");
             DataOutputStream os = new DataOutputStream(process.getOutputStream());
             os.writeBytes("setprop persist.sys.timezone GMT\n");
