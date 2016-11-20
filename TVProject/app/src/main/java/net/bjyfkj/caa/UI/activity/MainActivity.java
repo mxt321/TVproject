@@ -85,6 +85,7 @@ public class MainActivity extends Activity implements IDeviceLoginView, IDeviceD
     private boolean isRotation = false;//是否正在轮播
     private String strimage[] = null;//轮播图片列表
     private CarouselPagerAdapter carouselPagerAdapter;
+    private int imageposition = 0;
 
     @Override
 
@@ -92,7 +93,7 @@ public class MainActivity extends Activity implements IDeviceLoginView, IDeviceD
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main1);
         ButterKnife.inject(this);
-        init();
+
 
     }
 
@@ -100,8 +101,7 @@ public class MainActivity extends Activity implements IDeviceLoginView, IDeviceD
      * 初始化
      */
     public void init() {
-
-        PollingUtils.startPollingService(this, 3600, getAdsPlayListService.class, getAdsPlayListService.ACTION);
+        PollingUtils.startPollingService(this, 300, getAdsPlayListService.class, getAdsPlayListService.ACTION);
         view = LayoutInflater.from(MainActivity.this).inflate(R.layout
                 .alert_view, null);
         videoview.setMediaController(new MediaController(this));
@@ -113,11 +113,9 @@ public class MainActivity extends Activity implements IDeviceLoginView, IDeviceD
         deviceLoginPresenter.login();
     }
 
-    /***
-     * 图片轮播
+    /**
+     * * 图片轮播
      */
-    int imageposition = 0;
-
     private void initimager() {
         if (strimage != null) {
             strimage = null;
@@ -148,7 +146,6 @@ public class MainActivity extends Activity implements IDeviceLoginView, IDeviceD
                     .into(iv);
             ivList.add(iv);
         }
-
         carouselPagerAdapter = new CarouselPagerAdapter(ivList);
         int width = mCarouselView.getWidth();
         int height = mCarouselView.getHeight();
@@ -304,6 +301,7 @@ public class MainActivity extends Activity implements IDeviceLoginView, IDeviceD
     protected void onStart() {
         super.onStart();
         EventBus.getDefault().register(this);
+        init();
     }
 
     @Override
