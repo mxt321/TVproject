@@ -21,12 +21,16 @@ import net.bjyfkj.caa.R;
 import net.bjyfkj.caa.UI.adapter.CarouselPagerAdapter;
 import net.bjyfkj.caa.constant.LoginId;
 import net.bjyfkj.caa.entity.AdsPlayData;
+import net.bjyfkj.caa.entity.DanmakuItemData;
 import net.bjyfkj.caa.entity.VideoData;
 import net.bjyfkj.caa.eventBus.GetAdsPlayListEventBus;
 import net.bjyfkj.caa.eventBus.JPushEventBus;
 import net.bjyfkj.caa.model.CarouselViewPager;
 import net.bjyfkj.caa.model.Login;
 import net.bjyfkj.caa.model.ViewPagerScroller;
+import net.bjyfkj.caa.model.opendanmaku.DanmakuItem;
+import net.bjyfkj.caa.model.opendanmaku.DanmakuView;
+import net.bjyfkj.caa.model.opendanmaku.IDanmakuItem;
 import net.bjyfkj.caa.mvp.presenter.DeviceDownLoadVideoPresenter;
 import net.bjyfkj.caa.mvp.presenter.DeviceLoginPresenter;
 import net.bjyfkj.caa.mvp.presenter.DeviceSdCardListPresenter;
@@ -34,6 +38,7 @@ import net.bjyfkj.caa.mvp.view.IDeviceDownLoadVideoView;
 import net.bjyfkj.caa.mvp.view.IDeviceLoginView;
 import net.bjyfkj.caa.mvp.view.IDeviceSdCardView;
 import net.bjyfkj.caa.service.getAdsPlayListService;
+import net.bjyfkj.caa.util.GsonUtils;
 import net.bjyfkj.caa.util.JPushUtil;
 import net.bjyfkj.caa.util.PollingUtils;
 import net.bjyfkj.caa.util.SharedPreferencesUtils;
@@ -43,6 +48,8 @@ import net.bjyfkj.caa.util.getAdsPlayListUtil;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.xutils.x;
 
 import java.util.ArrayList;
@@ -66,6 +73,8 @@ public class MainActivity extends Activity implements IDeviceLoginView, IDeviceD
     TextView shopAddress;
     @InjectView(R.id.qrcode)
     ImageView qrcode;
+    @InjectView(R.id.danmakuView)
+    DanmakuView danmakuView;
 
 
     private AlertDialog.Builder builder;
@@ -86,6 +95,7 @@ public class MainActivity extends Activity implements IDeviceLoginView, IDeviceD
     private String strimage[] = null;//轮播图片列表
     private CarouselPagerAdapter carouselPagerAdapter;
     private int imageposition = 0;
+    private List<IDanmakuItem> danmakuItemList;//弹幕列表
 
     @Override
 
@@ -93,8 +103,6 @@ public class MainActivity extends Activity implements IDeviceLoginView, IDeviceD
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main1);
         ButterKnife.inject(this);
-
-
     }
 
     /***
@@ -288,7 +296,34 @@ public class MainActivity extends Activity implements IDeviceLoginView, IDeviceD
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(JPushEventBus jpush) {
         Log.i("CAAonEventMainThread --", jpush.message.toString() + "");
-        deviceLoginPresenter.getVideoPlay();
+        try {
+            JSONObject jsonObject = new JSONObject(jpush.message);
+            String cmd = jsonObject.getString("cmd");
+            switch (cmd) {
+                case "video_playlist_changed":
+                    Log.i("video_playlist_changed", "视频更新了");
+                    deviceLoginPresenter.getVideoPlay();
+                    break;
+                case "promotion_get":
+                    Log.i("promotion_get", "弹幕更新了" + jpush.message);
+                    danmakuItemList = new ArrayList<>();
+                    DanmakuItemData danmakuItemData = GsonUtils.json2Bean(jpush.message, DanmakuItemData.class);
+                    List<DanmakuItemData.DataBean> list = danmakuItemData.getData();
+                    for (DanmakuItemData.DataBean dataBean : list) {
+                        if (dataBean.getDevice_id().equals("d" + SharedPreferencesUtils.getParam(x.app(), LoginId.DEVICELOGINSTATE, "").toString())) {
+                            IDanmakuItem item = new DanmakuItem(this, dataBean.getNickname() + " " + dataBean.getContent(), danmakuView.getWidth());
+                            danmakuItemList.add(item);
+                        }
+                    }
+                    danmakuView.addItem(danmakuItemList, true);
+                    danmakuView.show();
+                    Log.i("danmakuItemList", "弹幕数量" + danmakuItemList.size());
+                    break;
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
     }
 
     //拿到服务器视频列表去下载

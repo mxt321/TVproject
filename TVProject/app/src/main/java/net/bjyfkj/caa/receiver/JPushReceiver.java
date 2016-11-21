@@ -28,7 +28,7 @@ public class JPushReceiver extends BroadcastReceiver {
             // 自定义消息不会展示在通知栏
             String content = bundle.getString(JPushInterface.EXTRA_MESSAGE);
             String extra = bundle.getString(JPushInterface.EXTRA_EXTRA);
-            Log.i("收到了自定义消息@@消息内容是:", content + "");
+            Log.i("JPushReceiver","收到推送消息~"+content);
             EventBus.getDefault().post(new JPushEventBus(content + ""));
         }
     }
