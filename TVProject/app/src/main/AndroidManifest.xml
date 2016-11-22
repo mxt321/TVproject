@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="net.bjyfkj.caa">
+    package="net.bjyfkj.caa"
+    android:versionCode="1"
+    android:versionName="1.0.0">
 
 
     <!-- Required -->
@@ -55,6 +57,13 @@
                 <action android:name="net.bjyfkj.caa.getAdsPlayListService"></action>
             </intent-filter>
         </service>
+        //app自动更新
+        <service android:name=".service.AppUpdateService">
+            <intent-filter>
+                <action android:name="android.service.APPUPDATE"></action>
+            </intent-filter>
+        </service>
+
 
         //开机自启动广播
         <receiver android:name=".receiver.StartActivityReceiver">

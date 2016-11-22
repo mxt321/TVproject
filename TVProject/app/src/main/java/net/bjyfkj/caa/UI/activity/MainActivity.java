@@ -2,9 +2,14 @@ package net.bjyfkj.caa.UI.activity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Service;
+import android.content.ComponentName;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -38,6 +43,7 @@ import net.bjyfkj.caa.mvp.view.IDeviceDownLoadVideoView;
 import net.bjyfkj.caa.mvp.view.IDeviceLoginView;
 import net.bjyfkj.caa.mvp.view.IDeviceSdCardView;
 import net.bjyfkj.caa.service.getAdsPlayListService;
+import net.bjyfkj.caa.util.DanmakuUtil;
 import net.bjyfkj.caa.util.GsonUtils;
 import net.bjyfkj.caa.util.JPushUtil;
 import net.bjyfkj.caa.util.PollingUtils;
@@ -76,7 +82,7 @@ public class MainActivity extends Activity implements IDeviceLoginView, IDeviceD
     @InjectView(R.id.danmakuView)
     DanmakuView danmakuView;
 
-
+    private final String ACTION = "android.service.APPUPDATE";
     private AlertDialog.Builder builder;
     private View view;
     private DeviceLoginPresenter deviceLoginPresenter;
@@ -103,7 +109,21 @@ public class MainActivity extends Activity implements IDeviceLoginView, IDeviceD
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main1);
         ButterKnife.inject(this);
+        Intent intentService = new Intent(ACTION);
+        bindService(intentService, conn, Service.BIND_AUTO_CREATE);
     }
+
+    ServiceConnection conn = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+
+        }
+    };
 
     /***
      * 初始化
@@ -309,13 +329,14 @@ public class MainActivity extends Activity implements IDeviceLoginView, IDeviceD
                     danmakuItemList = new ArrayList<>();
                     DanmakuItemData danmakuItemData = GsonUtils.json2Bean(jpush.message, DanmakuItemData.class);
                     List<DanmakuItemData.DataBean> list = danmakuItemData.getData();
+                    list = DanmakuUtil.Danmaku(list);//筛选重复的弹幕
                     for (DanmakuItemData.DataBean dataBean : list) {
                         if (dataBean.getDevice_id().equals("d" + SharedPreferencesUtils.getParam(x.app(), LoginId.DEVICELOGINSTATE, "").toString())) {
                             IDanmakuItem item = new DanmakuItem(this, dataBean.getNickname() + " " + dataBean.getContent(), danmakuView.getWidth());
                             danmakuItemList.add(item);
                         }
                     }
-                    danmakuView.addItem(danmakuItemList, true);
+                    danmakuView.addItem(danmakuItemList, true);//弹幕列表
                     danmakuView.show();
                     Log.i("danmakuItemList", "弹幕数量" + danmakuItemList.size());
                     break;
