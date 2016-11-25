@@ -2,14 +2,9 @@ package net.bjyfkj.caa.UI.activity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Service;
-import android.content.ComponentName;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.ServiceConnection;
 import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -30,6 +25,7 @@ import net.bjyfkj.caa.entity.DanmakuItemData;
 import net.bjyfkj.caa.entity.VideoData;
 import net.bjyfkj.caa.eventBus.GetAdsPlayListEventBus;
 import net.bjyfkj.caa.eventBus.JPushEventBus;
+import net.bjyfkj.caa.eventBus.UpdateVideoEventBus;
 import net.bjyfkj.caa.model.CarouselViewPager;
 import net.bjyfkj.caa.model.Login;
 import net.bjyfkj.caa.model.ViewPagerScroller;
@@ -43,9 +39,11 @@ import net.bjyfkj.caa.mvp.view.IDeviceDownLoadVideoView;
 import net.bjyfkj.caa.mvp.view.IDeviceLoginView;
 import net.bjyfkj.caa.mvp.view.IDeviceSdCardView;
 import net.bjyfkj.caa.service.getAdsPlayListService;
+import net.bjyfkj.caa.util.AppUpdate;
 import net.bjyfkj.caa.util.DanmakuUtil;
 import net.bjyfkj.caa.util.GsonUtils;
 import net.bjyfkj.caa.util.JPushUtil;
+import net.bjyfkj.caa.util.NetworkUtils;
 import net.bjyfkj.caa.util.PollingUtils;
 import net.bjyfkj.caa.util.SharedPreferencesUtils;
 import net.bjyfkj.caa.util.StringUtil;
@@ -66,6 +64,7 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import cn.jpush.android.api.JPushInterface;
 
+
 public class MainActivity extends Activity implements IDeviceLoginView, IDeviceDownLoadVideoView, IDeviceSdCardView {
 
 
@@ -75,12 +74,17 @@ public class MainActivity extends Activity implements IDeviceLoginView, IDeviceD
     CarouselViewPager mCarouselView;
     @InjectView(R.id.flytxtview)
     TextView flytxtview;
-    @InjectView(R.id.shop_address)
-    TextView shopAddress;
     @InjectView(R.id.qrcode)
     ImageView qrcode;
     @InjectView(R.id.danmakuView)
     DanmakuView danmakuView;
+    @InjectView(R.id.content)
+    TextView content;
+    @InjectView(R.id.item_img)
+    ImageView itemImg;
+    @InjectView(R.id.description)
+    TextView description;
+
 
     private final String ACTION = "android.service.APPUPDATE";
     private AlertDialog.Builder builder;
@@ -91,7 +95,6 @@ public class MainActivity extends Activity implements IDeviceLoginView, IDeviceD
     private EditText device_id;
     private List<VideoData.DataBean> videolist;//服务器视频列表
     private List<Map<String, String>> sdlist = new ArrayList<Map<String, String>>();
-    private boolean isplayvideo = true;//是否正在播放视频
     private int videoposition = 0;//
     private int playlistposition = 0;
     private int adsposition = 0;//广告下标
@@ -102,6 +105,7 @@ public class MainActivity extends Activity implements IDeviceLoginView, IDeviceD
     private CarouselPagerAdapter carouselPagerAdapter;
     private int imageposition = 0;
     private List<IDanmakuItem> danmakuItemList;//弹幕列表
+    private boolean isPlaying = false; //视频是否正在播放
 
     @Override
 
@@ -109,21 +113,79 @@ public class MainActivity extends Activity implements IDeviceLoginView, IDeviceD
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main1);
         ButterKnife.inject(this);
-        Intent intentService = new Intent(ACTION);
-        bindService(intentService, conn, Service.BIND_AUTO_CREATE);
+        danmakuView.show();
+
     }
 
-    ServiceConnection conn = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+    @Override
+    protected void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+        if (NetworkUtils.isWifiConnected(MainActivity.this)) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Thread.sleep(15000);
+                        AppUpdate app = new AppUpdate(MainActivity.this);
+                        Log.i("AppUpdate", "检查应用版本号");
+                        app.checkUpdateForTV(new AppUpdate.OnResult() {
+                            @Override
+                            public void onNewVersion() {
+                                Log.i("onNewVersion", "app有新版本");
+                            }
 
+                            @Override
+                            public void onLatestVersion() {
+                                Log.i("onLatestVersion", "app已是最新版本");
+                            }
+
+                            @Override
+                            public void onDownloading(long current, long total) {
+                                Log.i("onDownloading", "app正在下载");
+                            }
+
+                            @Override
+                            public void onDownLoaCompleted() {
+                                Log.i("onDownLoaCompleted", "app下载成功");
+                            }
+
+                            @Override
+                            public void onError() {
+                                Log.i("onError", "app下载失败");
+                            }
+                        });
+
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+            init();
+        } else {
+            Log.i("AppUpdate", "WIFI没有连接");
         }
+    }
 
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
+    @Override
+    protected void onPause() {
+        super.onPause();
+        JPushInterface.onPause(x.app());
+    }
 
-        }
-    };
+    @Override
+    protected void onResume() {
+        super.onResume();
+        JPushInterface.onResume(x.app());
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
+        PollingUtils.stopPollingService(this, getAdsPlayListService.class, getAdsPlayListService.ACTION);
+        Login.logout();
+    }
 
     /***
      * 初始化
@@ -164,7 +226,10 @@ public class MainActivity extends Activity implements IDeviceLoginView, IDeviceD
 //        } else {
         getAdsPlayListUtil.setPlayCount(adsData.getId());//广告自增
         Glide.with(x.app()).load(adsData.getQrcode()).into(qrcode);
-        shopAddress.setText(adsData.getShop_address());
+        Glide.with(x.app()).load(adsData.getItem_img()).into(itemImg);
+        description.setText(adsData.getDescription());
+        flytxtview.setText("本视频由\"" + adsData.getShop_name() + "\"特约播出 (" + adsData.getShop_address() + ")");
+        content.setText(adsData.getContent());
         ivList = new ArrayList<ImageView>();
         strimage = StringUtil.StringSplit(adsData.getImglist());
         for (int i = 0; i < strimage.length; i++) {
@@ -251,6 +316,7 @@ public class MainActivity extends Activity implements IDeviceLoginView, IDeviceD
             JPushUtil.setAlias(x.app(), "d" + deviceid);
             deviceLoginPresenter.getVideoPlay();
             getAdsPlayListUtil.getAdsPlayList();
+            deviceSdCardListPresenter.getSdCardVideoList();
         } else {
             builderShow();
         }
@@ -261,6 +327,9 @@ public class MainActivity extends Activity implements IDeviceLoginView, IDeviceD
     public void getVideoPlayList(List<VideoData.DataBean> list) {
         videolist = list;
         Log.i("getVideoPlayList", "CAAlist - " + list.size());
+        if (isPlaying) {
+            isPlaying = false;
+        }
         deviceDownLoadVideoPresenter.downLoadVideo();
     }
 
@@ -291,13 +360,14 @@ public class MainActivity extends Activity implements IDeviceLoginView, IDeviceD
     @Override
     public void downLoadSuccess() {
         Log.i("CAAdownLoadSuccess -- ", "下载成功");
-        if (playlistposition < videolist.size()) {
+        if (playlistposition < videolist.size() - 1) {
             playlistposition += 1;
             deviceDownLoadVideoPresenter.downLoadVideo();
         } else {
             Log.i("getSdCardVideoList", "getSdCardVideoList");
-            deviceSdCardListPresenter.getSdCardVideoList();
+            playlistposition = 0;
         }
+        deviceSdCardListPresenter.getSdCardVideoList();
     }
 
     //下载视频失败
@@ -306,6 +376,18 @@ public class MainActivity extends Activity implements IDeviceLoginView, IDeviceD
         Log.i("CAAdownLoadFailed -- ", "下载失败");
         deviceDownLoadVideoPresenter.downLoadVideo();
 
+    }
+
+    /**
+     * 获取SD卡视频列表
+     *
+     * @param updateVideoEventBus
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void updateVideo(UpdateVideoEventBus updateVideoEventBus) {
+        if (updateVideoEventBus.isupdate) {
+            deviceSdCardListPresenter.getSdCardVideoList();
+        }
     }
 
     /**
@@ -331,8 +413,8 @@ public class MainActivity extends Activity implements IDeviceLoginView, IDeviceD
                     List<DanmakuItemData.DataBean> list = danmakuItemData.getData();
                     list = DanmakuUtil.Danmaku(list);//筛选重复的弹幕
                     for (DanmakuItemData.DataBean dataBean : list) {
-                        if (dataBean.getDevice_id().equals("d" + SharedPreferencesUtils.getParam(x.app(), LoginId.DEVICELOGINSTATE, "").toString())) {
-                            IDanmakuItem item = new DanmakuItem(this, dataBean.getNickname() + " " + dataBean.getContent(), danmakuView.getWidth());
+                        if (dataBean.getDevice_id().equals(SharedPreferencesUtils.getParam(x.app(), LoginId.DEVICELOGINSTATE, "").toString())) {
+                            IDanmakuItem item = new DanmakuItem(this, dataBean.getNickname() + "领取" + dataBean.getContent(), danmakuView.getWidth());
                             danmakuItemList.add(item);
                         }
                     }
@@ -350,62 +432,39 @@ public class MainActivity extends Activity implements IDeviceLoginView, IDeviceD
     //拿到服务器视频列表去下载
     @Override
     public String VideoPlayPath() {
-        return videolist.get(videoposition).getUrl();
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        EventBus.getDefault().register(this);
-        init();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        JPushInterface.onPause(x.app());
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        JPushInterface.onResume(x.app());
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        EventBus.getDefault().unregister(this);
-        PollingUtils.stopPollingService(this, getAdsPlayListService.class, getAdsPlayListService.ACTION);
-        Login.logout();
+        return videolist.get(playlistposition).getUrl();
     }
 
     //获取sdcard视频列表
     @Override
-    public void getSdCardVideoList(List<Map<String, String>> list) {
-        Log.i("asd", "获取sdcard视频列表");
+    public void getSdCardVideoLists(List<Map<String, String>> list) {
+        Log.i("asd", "获取sdcard视频列表" + list.size());
         sdlist = null;
         sdlist = list;
-        if (isplayvideo == true) {
-            playVideo();
+        if (sdlist.size() > 0) {
+            if (!isPlaying) {
+                playVideo();
+            }
         }
     }
 
     //播放视频
     public void playVideo() {
-        isplayvideo = false;
+        isPlaying = true;
+        if (videoposition > sdlist.size() - 1) {
+            videoposition = 0;
+        }
         Map<String, String> map = sdlist.get(videoposition);
-        videoposition++;
         final String Path = map.get("path");
         Log.i("CAAplayVideo -path ", Path + "");
         videoview.setVideoPath(Path);
         videoview.start();
+        videoposition++;
         videoview.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
-                if (videoposition >= sdlist.size()) {
-                    videoposition = 0;
-                }
+                deviceSdCardListPresenter.getSdCardVideoList();
+                isPlaying = false;
                 playVideo();
             }
         });

@@ -9,7 +9,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Environment;
-
+import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -76,6 +76,7 @@ public class AppUpdate {
         isAutoInstall = false;
         checkUpdate(resultListener);
     }
+
     //apk下载存放的位置
     private String getPath() {
         String path = Environment.getExternalStorageDirectory()
@@ -89,6 +90,7 @@ public class AppUpdate {
 
     /***
      * 访问接口检查更新
+     *
      * @param resultListener
      */
     private void checkUpdate(final OnResult resultListener) {
@@ -99,8 +101,8 @@ public class AppUpdate {
         } else {
             params.addParameter("client", "android");
         }
-        params.addParameter("versionCode", getAppVersionCode());
-        params.addParameter("sign",sign);
+        params.addParameter("version_code", getAppVersionCode());
+        params.addParameter("sign", sign);
         x.http().get(params, new Callback.CommonCallback<JSONObject>() {
             @Override
             public void onSuccess(JSONObject result) {
@@ -108,6 +110,7 @@ public class AppUpdate {
                     if (result.getInt("status") == 1) {
                         resultListener.onNewVersion();
                         final String dl_url = result.getJSONObject("data").getString("dl_url");
+                        Log.i("dl_url", dl_url + "");
                         if (isAutoInstall) {
                             downLoadApk(dl_url, resultListener);
                         } else {
@@ -253,8 +256,8 @@ public class AppUpdate {
 
     //root身份静默安装
     private boolean rootInstallAPK(String filename) {
-        String setFilePermissionCommand = "chmod 644 /data/app/net.hfnzz.www.hcb_assistant-1.apk";
-        String copyFileCommand = "cat /storage/sdcard0/DZZS/" + filename + " >/data/app/net.hfnzz.www.hcb_assistant-1.apk";
+        String setFilePermissionCommand = "chmod 644 /data/app/net.bjyfkj.caa-1.apk";
+        String copyFileCommand = "cat /storage/sdcard0/DZZS/" + filename + " >/data/app/net.bjyfkj.caa-1.apk";
         if (!rootExec(copyFileCommand)) {
             return false;
         }

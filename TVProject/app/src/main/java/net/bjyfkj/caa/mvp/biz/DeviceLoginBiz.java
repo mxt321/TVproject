@@ -7,6 +7,7 @@ import net.bjyfkj.caa.util.GsonUtils;
 import net.bjyfkj.caa.util.MD5Util;
 import net.bjyfkj.caa.util.PropertiesUtils;
 import net.bjyfkj.caa.util.TimeUtil;
+import net.bjyfkj.caa.util.UpdateVideo;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -81,6 +82,7 @@ public class DeviceLoginBiz implements IDeviceLoginBiz {
                     if (jsonInt == 1) {
                         VideoData vd = GsonUtils.json2Bean(result, VideoData.class);
                         List<VideoData.DataBean> list = vd.getData();
+                        UpdateVideo.UpdateVideolist(list);
                         linsterenr.loginSuccess(list);
                     } else {
                         linsterenr.loginFailed();

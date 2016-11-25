@@ -32,7 +32,7 @@ public class DeviceSdCardListPresenter {
                 iDeviceSdCardBiz.getSdCradVideoList(SdCardPath.BASE_PATH, new OnDeviceSdCardListener() {
                     @Override
                     public void getSdCardSuccess(List<Map<String, String>> sdlist) {
-                        iDeviceSdCardView.getSdCardVideoList(sdlist);
+                        iDeviceSdCardView.getSdCardVideoLists(sdlist);
                     }
 
                     @Override

@@ -10,5 +10,6 @@ import java.io.File;
 public class SdCardPath {
 
     public static final String BASE_PATH = Environment.getExternalStorageDirectory().getPath() + File.separator + "videoPlay/";
+    public static final String ADS_PATH = Environment.getExternalStorageDirectory().getPath() + File.separator + "adsPlay/";
 
 }

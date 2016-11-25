@@ -28,6 +28,7 @@ public class DeviceDownLoadVideoPresenter {
     public void downLoadVideo() {
         String url = iDeviceDownLoadVideoView.VideoPlayPath();
         String path = SdCardPath.BASE_PATH + url.substring(url.lastIndexOf("/") + 1);
+        Log.i("downLoadVideo", url + "+" + path);
         if (SdCardUtil.fileIsExists(path)) {
             Log.i("CAAdownLoadVideo -- ", "文件已存在");
             iDeviceDownLoadVideoView.downLoadSuccess();

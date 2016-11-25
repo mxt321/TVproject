@@ -10,5 +10,4 @@ public interface IDeviceDownLoadVideoView {
 
     String VideoPlayPath();
 
-
 }

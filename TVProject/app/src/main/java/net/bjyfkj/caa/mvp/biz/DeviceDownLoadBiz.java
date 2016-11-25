@@ -16,6 +16,7 @@ public class DeviceDownLoadBiz implements IDeviceDownLoadBiz {
     public void downloadFile(String url, String path, final OnDeviceDownLoadVideoListener listener) {
         RequestParams requestParams = new RequestParams(url);
         requestParams.setSaveFilePath(path);
+        requestParams.setAutoRename(true);
         x.http().get(requestParams, new Callback.CommonCallback<File>() {
             @Override
             public void onSuccess(File result) {

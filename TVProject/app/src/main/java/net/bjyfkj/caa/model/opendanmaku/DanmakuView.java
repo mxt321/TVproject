@@ -36,8 +36,7 @@ public class DanmakuView extends View {
     private float mEndYOffset = 0.9f;//最后一个弹道在Y轴上的偏移占整个View的百分比
 
 
-
-    private HashMap<Integer,ArrayList<IDanmakuItem>> mChannelMap;
+    private HashMap<Integer, ArrayList<IDanmakuItem>> mChannelMap;
     private final java.util.Deque<IDanmakuItem> mWaitingItems = new LinkedList<>();
     private int[] mChannelY; //每条弹道的Y坐标
     private static final float mPartition = 0.95f; //仅View顶部的部分可以播放弹幕百分比
@@ -81,7 +80,7 @@ public class DanmakuView extends View {
     }
 
     private void checkYOffset(float start, float end) {
-        if (start >= end ){
+        if (start >= end) {
             throw new IllegalArgumentException("start_Y_offset must < end_Y_offset");
         }
         if (start < 0f || start >= 1f || end < 0f || end > 1f) {
@@ -107,16 +106,16 @@ public class DanmakuView extends View {
         initChannelY();
     }
 
-    private void initChannelMap(){
+    private void initChannelMap() {
         mChannelMap = new HashMap<>(mMaxRow);
         for (int i = 0; i < mMaxRow; i++) {
-            ArrayList<IDanmakuItem> runningRow= new ArrayList<IDanmakuItem>(mMaxRunningPerRow);
+            ArrayList<IDanmakuItem> runningRow = new ArrayList<IDanmakuItem>(mMaxRunningPerRow);
             mChannelMap.put(i, runningRow);
         }
     }
 
     private void initChannelY() {
-        if (mChannelY == null){
+        if (mChannelY == null) {
             mChannelY = new int[mMaxRow];
         }
 
@@ -199,7 +198,9 @@ public class DanmakuView extends View {
     }
 
 
-    /**随机寻找一个可以播放弹幕而不会发生碰撞的弹道,返回弹道的Y坐标在mChannelY上的index,如果没有找到则返回-1*/
+    /**
+     * 随机寻找一个可以播放弹幕而不会发生碰撞的弹道,返回弹道的Y坐标在mChannelY上的index,如果没有找到则返回-1
+     */
     private int findVacant(IDanmakuItem item) {
         try {//fix NPT exception
             for (int i = 0; i < mMaxRow; i++) {
@@ -251,19 +252,25 @@ public class DanmakuView extends View {
     }
 
 
-    /**播放显示弹幕*/
+    /**
+     * 播放显示弹幕
+     */
     public void show() {
         status = STATUS_RUNNING;
         invalidate();
     }
 
-    /**隐藏弹幕,暂停播放*/
+    /**
+     * 隐藏弹幕,暂停播放
+     */
     public void hide() {
         status = STATUS_PAUSE;
         invalidate();
     }
 
-    /**清空正在播放和等待播放的弹幕*/
+    /**
+     * 清空正在播放和等待播放的弹幕
+     */
     public void clear() {
         status = STATUS_STOP;
         clearItems();
@@ -291,7 +298,7 @@ public class DanmakuView extends View {
         }
     }
 
-    private void clearWaiting(){
+    private void clearWaiting() {
         if (null != mWaitingItems && !mWaitingItems.isEmpty()) {
             mWaitingItems.clear();
         }
@@ -332,10 +339,12 @@ public class DanmakuView extends View {
         }
     }
 
-    /**是否新建后台线程来执行添加任务*/
+    /**
+     * 是否新建后台线程来执行添加任务
+     */
     public void addItem(final List<IDanmakuItem> list, boolean backgroundLoad) {
         if (backgroundLoad) {
-            new Thread(){
+            new Thread() {
                 @Override
                 public void run() {
                     synchronized (mWaitingItems) {
@@ -350,7 +359,9 @@ public class DanmakuView extends View {
     }
 
 
-    /** Calculates and returns frames per second */
+    /**
+     * Calculates and returns frames per second
+     */
     private double fps() {
         long lastTime = System.nanoTime();
         times.addLast(lastTime);

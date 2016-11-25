@@ -67,7 +67,7 @@ public class getAdsPlayListUtil {
     /***
      * @param adsid
      */
-    public static void setPlayCount(int adsid) {
+    public static void setPlayCount(String adsid) {
         String sign = MD5Util.encrypt("Device" + MD5Util.encrypt("bjyfkj4006010136") + "setPlayCount");
         RequestParams params = new RequestParams(PropertiesUtils.getpath("setPlayCount"));
         params.addBodyParameter("sign", sign);

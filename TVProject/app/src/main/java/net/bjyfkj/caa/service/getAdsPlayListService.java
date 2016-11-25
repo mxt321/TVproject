@@ -5,7 +5,10 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
 
+import net.bjyfkj.caa.util.NetworkUtils;
 import net.bjyfkj.caa.util.getAdsPlayListUtil;
+
+import org.xutils.x;
 
 /**
  * Created by YFKJ-1 on 2016/11/9.
@@ -40,7 +43,9 @@ public class getAdsPlayListService extends Service {
         @Override
         public void run() {
             Log.i("PollingThread", "PollingThread执行了");
-            getAdsPlayListUtil.getAdsPlayList();
+            if (NetworkUtils.isWifiConnected(x.app())) {
+                getAdsPlayListUtil.getAdsPlayList();
+            }
         }
     }
 
