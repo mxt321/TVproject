@@ -6,5 +6,5 @@ package net.bjyfkj.caa.constant;
 public class LoginId {
 
     public static final String DEVICELOGINSTATE = "device_id";
-
+    public static final String JSONCACHE = "jsoncache";
 }

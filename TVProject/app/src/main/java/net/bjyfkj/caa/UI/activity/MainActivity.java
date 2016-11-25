@@ -44,6 +44,7 @@ import net.bjyfkj.caa.util.DanmakuUtil;
 import net.bjyfkj.caa.util.GsonUtils;
 import net.bjyfkj.caa.util.JPushUtil;
 import net.bjyfkj.caa.util.NetworkUtils;
+import net.bjyfkj.caa.util.NoConnectedJsonUtil;
 import net.bjyfkj.caa.util.PollingUtils;
 import net.bjyfkj.caa.util.SharedPreferencesUtils;
 import net.bjyfkj.caa.util.StringUtil;
@@ -99,7 +100,7 @@ public class MainActivity extends Activity implements IDeviceLoginView, IDeviceD
     private int playlistposition = 0;
     private int adsposition = 0;//广告下标
     private List<ImageView> ivList;//图片轮播控件列表
-    private List<AdsPlayData.DataBean> adslist;//广告列表
+    private List<AdsPlayData.DataBean> adslist = new ArrayList<>();//广告列表
     private boolean isRotation = false;//是否正在轮播
     private String strimage[] = null;//轮播图片列表
     private CarouselPagerAdapter carouselPagerAdapter;
@@ -113,15 +114,14 @@ public class MainActivity extends Activity implements IDeviceLoginView, IDeviceD
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main1);
         ButterKnife.inject(this);
+        EventBus.getDefault().register(this);
         danmakuView.show();
-
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        EventBus.getDefault().register(this);
-        if (NetworkUtils.isWifiConnected(MainActivity.this)) {
+        if (NetworkUtils.isConnected(MainActivity.this)) {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -161,46 +161,63 @@ public class MainActivity extends Activity implements IDeviceLoginView, IDeviceD
                     }
                 }
             }).start();
-            init();
         } else {
             Log.i("AppUpdate", "WIFI没有连接");
         }
+        init();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        JPushInterface.onPause(x.app());
+        if (NetworkUtils.isConnected(this)) {
+            JPushInterface.onPause(x.app());
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        JPushInterface.onResume(x.app());
+        if (NetworkUtils.isConnected(this)) {
+            JPushInterface.onResume(x.app());
+        }
+
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().unregister(this);
-        PollingUtils.stopPollingService(this, getAdsPlayListService.class, getAdsPlayListService.ACTION);
-        Login.logout();
+        if (NetworkUtils.isConnected(this)) {
+            PollingUtils.stopPollingService(this, getAdsPlayListService.class, getAdsPlayListService.ACTION);
+            Login.logout();
+        }
+
     }
 
     /***
      * 初始化
      */
     public void init() {
-        PollingUtils.startPollingService(this, 300, getAdsPlayListService.class, getAdsPlayListService.ACTION);
+        videoview.setMediaController(new MediaController(this));
         view = LayoutInflater.from(MainActivity.this).inflate(R.layout
                 .alert_view, null);
-        videoview.setMediaController(new MediaController(this));
         device_id = (EditText) view.findViewById(R.id.edt_userid);
         deviceLoginPresenter = new DeviceLoginPresenter(this);
         deviceDownLoadVideoPresenter = new DeviceDownLoadVideoPresenter(this);
         deviceSdCardListPresenter = new DeviceSdCardListPresenter(this);
-        deviceLoginPresenter.updateDeviceTime();
-        deviceLoginPresenter.login();
+        if (NetworkUtils.isConnected(this)) {
+            PollingUtils.startPollingService(this, 300, getAdsPlayListService.class, getAdsPlayListService.ACTION);
+            deviceLoginPresenter.updateDeviceTime();
+            deviceLoginPresenter.login();
+        } else {
+            deviceSdCardListPresenter.getSdCardVideoList();
+            if (NoConnectedJsonUtil.noCongetAdsList(SharedPreferencesUtils.getParam(this, LoginId.JSONCACHE, "").toString()) != null) {
+                adslist = NoConnectedJsonUtil.noCongetAdsList(SharedPreferencesUtils.getParam(this, LoginId.JSONCACHE, "").toString());
+                initimager();
+            }
+        }
+
     }
 
     /**
@@ -224,9 +241,9 @@ public class MainActivity extends Activity implements IDeviceLoginView, IDeviceD
 //            adsposition++;
 //            initimager();
 //        } else {
-        getAdsPlayListUtil.setPlayCount(adsData.getId());//广告自增
-        Glide.with(x.app()).load(adsData.getQrcode()).into(qrcode);
-        Glide.with(x.app()).load(adsData.getItem_img()).into(itemImg);
+        if (NetworkUtils.isConnected(this)) {
+            getAdsPlayListUtil.setPlayCount(adsData.getId());//广告自增
+        }
         description.setText(adsData.getDescription());
         flytxtview.setText("本视频由\"" + adsData.getShop_name() + "\"特约播出 (" + adsData.getShop_address() + ")");
         content.setText(adsData.getContent());
@@ -239,6 +256,8 @@ public class MainActivity extends Activity implements IDeviceLoginView, IDeviceD
                     .into(iv);
             ivList.add(iv);
         }
+        Glide.with(x.app()).load(adsData.getQrcode()).into(qrcode);
+        Glide.with(x.app()).load(adsData.getItem_img()).into(itemImg);
         carouselPagerAdapter = new CarouselPagerAdapter(ivList);
         int width = mCarouselView.getWidth();
         int height = mCarouselView.getHeight();
@@ -470,6 +489,7 @@ public class MainActivity extends Activity implements IDeviceLoginView, IDeviceD
         });
     }
 
+    //获取广告信息
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void getAdsPlayList(GetAdsPlayListEventBus getAdsPlayListEventBus) {
         adslist = getAdsPlayListEventBus.result;

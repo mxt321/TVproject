@@ -43,7 +43,7 @@ public class getAdsPlayListService extends Service {
         @Override
         public void run() {
             Log.i("PollingThread", "PollingThread执行了");
-            if (NetworkUtils.isWifiConnected(x.app())) {
+            if (NetworkUtils.isConnected(x.app())) {
                 getAdsPlayListUtil.getAdsPlayList();
             }
         }
