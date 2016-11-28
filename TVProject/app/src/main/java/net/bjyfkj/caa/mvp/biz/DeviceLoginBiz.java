@@ -72,6 +72,7 @@ public class DeviceLoginBiz implements IDeviceLoginBiz {
         RequestParams params = new RequestParams(PropertiesUtils.getpath("getVideoPlayList"));
         params.addBodyParameter("sign", sign + "");
         params.addBodyParameter("device_id", device_id);
+        params.setConnectTimeout(15000);
         x.http().get(params, new Callback.CommonCallback<String>() {
             @Override
             public void onSuccess(String result) {
@@ -85,6 +86,7 @@ public class DeviceLoginBiz implements IDeviceLoginBiz {
                         UpdateVideo.UpdateVideolist(list);
                         linsterenr.loginSuccess(list);
                     } else {
+                        UpdateVideo.deleteFile();
                         linsterenr.loginFailed();
                     }
                 } catch (JSONException e) {

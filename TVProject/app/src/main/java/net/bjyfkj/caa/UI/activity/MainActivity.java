@@ -48,6 +48,7 @@ import net.bjyfkj.caa.util.NoConnectedJsonUtil;
 import net.bjyfkj.caa.util.PollingUtils;
 import net.bjyfkj.caa.util.SharedPreferencesUtils;
 import net.bjyfkj.caa.util.StringUtil;
+import net.bjyfkj.caa.util.TimeUtil;
 import net.bjyfkj.caa.util.getAdsPlayListUtil;
 
 import org.greenrobot.eventbus.EventBus;
@@ -98,7 +99,7 @@ public class MainActivity extends Activity implements IDeviceLoginView, IDeviceD
     private List<Map<String, String>> sdlist = new ArrayList<Map<String, String>>();
     private int videoposition = 0;//
     private int playlistposition = 0;
-    private int adsposition = 0;//广告下标
+    private int adsposition = 0;//广告下标13
     private List<ImageView> ivList;//图片轮播控件列表
     private List<AdsPlayData.DataBean> adslist = new ArrayList<>();//广告列表
     private boolean isRotation = false;//是否正在轮播
@@ -208,7 +209,6 @@ public class MainActivity extends Activity implements IDeviceLoginView, IDeviceD
         deviceSdCardListPresenter = new DeviceSdCardListPresenter(this);
         if (NetworkUtils.isConnected(this)) {
             PollingUtils.startPollingService(this, 300, getAdsPlayListService.class, getAdsPlayListService.ACTION);
-            deviceLoginPresenter.updateDeviceTime();
             deviceLoginPresenter.login();
         } else {
             deviceSdCardListPresenter.getSdCardVideoList();
@@ -237,73 +237,80 @@ public class MainActivity extends Activity implements IDeviceLoginView, IDeviceD
             ivList = null;
         }
         final AdsPlayData.DataBean adsData = adslist.get(adsposition);//广告数据
-//        if (!TimeUtil.initWeclomeText().equals(adsData.getType())) {
-//            adsposition++;
-//            initimager();
-//        } else {
-        if (NetworkUtils.isConnected(this)) {
-            getAdsPlayListUtil.setPlayCount(adsData.getId());//广告自增
-        }
-        description.setText(adsData.getDescription());
-        flytxtview.setText("本视频由\"" + adsData.getShop_name() + "\"特约播出 (" + adsData.getShop_address() + ")");
-        content.setText(adsData.getContent());
-        ivList = new ArrayList<ImageView>();
-        strimage = StringUtil.StringSplit(adsData.getImglist());
-        for (int i = 0; i < strimage.length; i++) {
-            ImageView iv = new ImageView(getApplicationContext());
-            Glide.with(getApplicationContext())
-                    .load(strimage[i])
-                    .into(iv);
-            ivList.add(iv);
-        }
-        Glide.with(x.app()).load(adsData.getQrcode()).into(qrcode);
-        Glide.with(x.app()).load(adsData.getItem_img()).into(itemImg);
-        carouselPagerAdapter = new CarouselPagerAdapter(ivList);
-        int width = mCarouselView.getWidth();
-        int height = mCarouselView.getHeight();
-        Log.i("width", width + "");
-        Log.i("height", height + "");
-        mCarouselView.setAdapter(carouselPagerAdapter);
-        mCarouselView.setDisplayTime(20000);
-        ViewPagerScroller scroller = new ViewPagerScroller(getApplicationContext());
-        scroller.setScrollDuration(5000);
-        scroller.initViewPagerScroll(mCarouselView);
-        mCarouselView.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
+        if (TimeUtil.isNEWDay(adsData.getTime())) { //判断是否是今天
+//            if (!TimeUtil.initWeclomeText().equals(adsData.getType())) {//判断是否是当前时间段
+//                adsposition++;
+//                initimager();
+//            } else {
+            if (NetworkUtils.isConnected(this)) {
+                getAdsPlayListUtil.setPlayCount(adsData.getId());//广告自增
             }
-
-            @Override
-            public void onPageSelected(int position) {
-
+            Log.i("adsPlay_id", adsData.getTime() + "");
+            description.setText(adsData.getDescription());
+            flytxtview.setText("本视频由\"" + adsData.getShop_name() + "\"特约播出 (" + adsData.getShop_address() + ")");
+            content.setText(adsData.getContent());
+            ivList = new ArrayList<ImageView>();
+            strimage = StringUtil.StringSplit(adsData.getImglist());
+            for (int i = 0; i < strimage.length; i++) {
+                ImageView iv = new ImageView(getApplicationContext());
+                Glide.with(getApplicationContext())
+                        .load(strimage[i])
+                        .into(iv);
+                ivList.add(iv);
             }
+            Glide.with(x.app()).load(adsData.getQrcode()).into(qrcode);
+            Glide.with(x.app()).load(adsData.getItem_img()).into(itemImg);
+            carouselPagerAdapter = new CarouselPagerAdapter(ivList);
+            int width = mCarouselView.getWidth();
+            int height = mCarouselView.getHeight();
+            Log.i("width", width + "");
+            Log.i("height", height + "");
+            mCarouselView.setAdapter(carouselPagerAdapter);
+            mCarouselView.setDisplayTime(20000);
+            ViewPagerScroller scroller = new ViewPagerScroller(getApplicationContext());
+            scroller.setScrollDuration(5000);
+            scroller.initViewPagerScroll(mCarouselView);
+            mCarouselView.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+                @Override
+                public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
-            @Override
-            public void onPageScrollStateChanged(int state) {
-                if (state == ViewPager.SCROLL_STATE_DRAGGING) {
-                    //正在滑动   pager处于正在拖拽中
-                    Log.d("测试代码", "onPageScrollStateChanged=======正在滑动" + "SCROLL_STATE_DRAGGING");
-                } else if (state == ViewPager.SCROLL_STATE_SETTLING) {
-                    //pager 正在自动沉降，相当于松手后，pager恢复到一个完整pager的过程
-                    Log.d("测试代码", "onPageScrollStateChanged=======自动沉降" + "SCROLL_STATE_SETTLING");
-                    imageposition++;
-                    if (strimage.length == imageposition) {
-                        imageposition = 0;
-                        adsposition++;
-                        initimager();
-                    } else {
-                        videoview.pause();
-                    }
-                } else if (state == ViewPager.SCROLL_STATE_IDLE) {
-                    //空闲状态  pager处于空闲状态
-                    Log.d("测试代码", "onPageScrollStateChanged=======空闲状态" + "SCROLL_STATE_IDLE");
-                    videoview.start();
                 }
-            }
-        });
-        mCarouselView.start();
-//    }
+
+                @Override
+                public void onPageSelected(int position) {
+
+                }
+
+                @Override
+                public void onPageScrollStateChanged(int state) {
+                    if (state == ViewPager.SCROLL_STATE_DRAGGING) {
+                        //正在滑动   pager处于正在拖拽中
+                        Log.d("测试代码", "onPageScrollStateChanged=======正在滑动" + "SCROLL_STATE_DRAGGING");
+                    } else if (state == ViewPager.SCROLL_STATE_SETTLING) {
+                        //pager 正在自动沉降，相当于松手后，pager恢复到一个完整pager的过程
+                        Log.d("测试代码", "onPageScrollStateChanged=======自动沉降" + "SCROLL_STATE_SETTLING");
+                        imageposition++;
+                        if (strimage.length == imageposition) {
+                            imageposition = 0;
+                            adsposition++;
+                            initimager();
+                        } else {
+                            videoview.pause();
+                        }
+                    } else if (state == ViewPager.SCROLL_STATE_IDLE) {
+                        //空闲状态  pager处于空闲状态
+                        Log.d("测试代码", "onPageScrollStateChanged=======空闲状态" + "SCROLL_STATE_IDLE");
+                        videoview.start();
+                    }
+                }
+            });
+            mCarouselView.start();
+//            }
+        } else {
+            adsposition++;
+            initimager();
+        }
+
     }
 
 
@@ -333,9 +340,9 @@ public class MainActivity extends Activity implements IDeviceLoginView, IDeviceD
         if (isSuccess) {
             SharedPreferencesUtils.setParam(x.app(), LoginId.DEVICELOGINSTATE, deviceid + "");
             JPushUtil.setAlias(x.app(), "d" + deviceid);
+            deviceLoginPresenter.updateDeviceTime();
             deviceLoginPresenter.getVideoPlay();
             getAdsPlayListUtil.getAdsPlayList();
-            deviceSdCardListPresenter.getSdCardVideoList();
         } else {
             builderShow();
         }
@@ -415,7 +422,7 @@ public class MainActivity extends Activity implements IDeviceLoginView, IDeviceD
      * @param jpush
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEventMainThread(JPushEventBus jpush) {
+    public void onEventMainThread(final JPushEventBus jpush) {
         Log.i("CAAonEventMainThread --", jpush.message.toString() + "");
         try {
             JSONObject jsonObject = new JSONObject(jpush.message);
@@ -426,20 +433,25 @@ public class MainActivity extends Activity implements IDeviceLoginView, IDeviceD
                     deviceLoginPresenter.getVideoPlay();
                     break;
                 case "promotion_get":
-                    Log.i("promotion_get", "弹幕更新了" + jpush.message);
-                    danmakuItemList = new ArrayList<>();
-                    DanmakuItemData danmakuItemData = GsonUtils.json2Bean(jpush.message, DanmakuItemData.class);
-                    List<DanmakuItemData.DataBean> list = danmakuItemData.getData();
-                    list = DanmakuUtil.Danmaku(list);//筛选重复的弹幕
-                    for (DanmakuItemData.DataBean dataBean : list) {
-                        if (dataBean.getDevice_id().equals(SharedPreferencesUtils.getParam(x.app(), LoginId.DEVICELOGINSTATE, "").toString())) {
-                            IDanmakuItem item = new DanmakuItem(this, dataBean.getNickname() + "领取" + dataBean.getContent(), danmakuView.getWidth());
-                            danmakuItemList.add(item);
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.i("promotion_get", "弹幕更新了" + jpush.message);
+                            danmakuItemList = new ArrayList<>();
+                            DanmakuItemData danmakuItemData = GsonUtils.json2Bean(jpush.message, DanmakuItemData.class);
+                            List<DanmakuItemData.DataBean> list = danmakuItemData.getData();
+                            list = DanmakuUtil.Danmaku(list);//筛选重复的弹幕
+                            for (DanmakuItemData.DataBean dataBean : list) {
+                                if (dataBean.getDevice_id().equals(SharedPreferencesUtils.getParam(x.app(), LoginId.DEVICELOGINSTATE, "").toString())) {
+                                    IDanmakuItem item = new DanmakuItem(MainActivity.this, "扫码领取(" + dataBean.getContent() + ")成功 " + dataBean.getNickname(), danmakuView.getWidth());
+                                    danmakuItemList.add(item);
+                                }
+                            }
+                            danmakuView.addItem(danmakuItemList, true);//弹幕列表
+                            danmakuView.show();
+                            Log.i("danmakuItemList", "弹幕数量" + danmakuItemList.size());
                         }
-                    }
-                    danmakuView.addItem(danmakuItemList, true);//弹幕列表
-                    danmakuView.show();
-                    Log.i("danmakuItemList", "弹幕数量" + danmakuItemList.size());
+                    }).start();
                     break;
             }
         } catch (JSONException e) {

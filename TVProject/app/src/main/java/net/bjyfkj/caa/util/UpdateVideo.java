@@ -26,30 +26,47 @@ public class UpdateVideo {
      */
     public static void UpdateVideolist(final List<VideoData.DataBean> list) {
         File files = new File(SdCardPath.BASE_PATH);
-        List<String> sdlist = getVideoList();
-        List<String> fwqlist = getfwqlist(list);
         if (files.exists()) {
-            if (sdlist.size() > 0) {
-                if (fwqlist.size() > 0) {
-                    for (int i = 0; i < sdlist.size(); i++) {
-                        boolean isExists = true;
-                        for (int j = 0; j < fwqlist.size(); j++) {
-                            if (sdlist.get(i).equals(fwqlist.get(j))) {
-                                isExists = false;
+            List<String> sdlist = getVideoList();
+            List<String> fwqlist = getfwqlist(list);
+            if (files.exists()) {//文件夹是否存在
+                if (sdlist.size() > 0) {//文件夹内的视频列表大于0
+                    if (fwqlist.size() > 0) {//服务器视频列表大于0
+                        for (int i = 0; i < sdlist.size(); i++) {//循环文件夹内的视频列表
+                            boolean isExists = true;//本地的视频是否在服务器列表里面
+                            for (int j = 0; j < fwqlist.size(); j++) {//循环服务器视频列表
+                                if (sdlist.get(i).equals(fwqlist.get(j))) {
+                                    isExists = false;
+                                }
+                            }
+                            if (isExists == true) {
+                                File file = new File(SdCardPath.BASE_PATH + sdlist.get(i));
+                                file.delete();
+                                Log.i("file", file.getName() + "删除了");
                             }
                         }
-                        if (isExists == true) {
-                            File file = new File(SdCardPath.BASE_PATH + sdlist.get(i));
-                            file.delete();
-                            Log.i("file", file.getName() + "删除了");
-                        }
+                    } else {
+                        files.delete();
                     }
-                } else {
-                    files.delete();
                 }
             }
+            EventBus.getDefault().post(new UpdateVideoEventBus(true));
         }
-        EventBus.getDefault().post(new UpdateVideoEventBus(true));
+    }
+
+    /***
+     * 删除文件夹
+     */
+    public static void deleteFile() {
+        File files = new File(SdCardPath.BASE_PATH);
+        if (files.exists()) {
+            List<String> sdlist = getVideoList();
+            for (int i = 0; i < sdlist.size(); i++) {
+                File file = new File(SdCardPath.BASE_PATH + sdlist.get(i));
+                file.delete();
+            }
+            Log.i("deleteFile", "删除视频文件夹内所有内容");
+        }
     }
 
 

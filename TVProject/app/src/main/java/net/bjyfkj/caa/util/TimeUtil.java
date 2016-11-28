@@ -12,6 +12,7 @@ import java.io.IOException;
 public class TimeUtil {
     /**
      * 修改系统时间
+     * 根据时间戳修改
      */
     public static void testDate(String time) {
         try {
@@ -28,7 +29,11 @@ public class TimeUtil {
         }
     }
 
-
+    /**
+     * 判断当前时间是上午还是下午
+     *
+     * @return
+     */
     public static String initWeclomeText() {
         Time t = new Time();
         t.setToNow();
@@ -38,5 +43,21 @@ public class TimeUtil {
             return "1";
         }
         return null;
+    }
+
+    /***
+     * 判断时间戳是否是今天
+     *
+     * @param timestamp
+     */
+    public static boolean isNEWDay(String timestamp) {
+        String date = DateUtils.getTodayDateTime();
+        Log.i("date", date);
+        String time = DateUtils.timesTwo(timestamp);
+        Log.i("time", time);
+        if (date.equals(time)) {
+            return true;
+        }
+        return false;
     }
 }

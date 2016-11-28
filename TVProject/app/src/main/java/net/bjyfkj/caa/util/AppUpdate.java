@@ -247,6 +247,7 @@ public class AppUpdate {
         PackageInfo pi = null;
         try {
             pi = pm.getPackageInfo(mContext.getPackageName(), 0);
+            Log.i("versionCode", pi.versionCode + "");
         } catch (PackageManager.NameNotFoundException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
