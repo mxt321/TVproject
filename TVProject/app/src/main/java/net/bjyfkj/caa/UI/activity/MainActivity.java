@@ -202,7 +202,7 @@ public class MainActivity extends Activity implements IDeviceLoginView, IDeviceD
     public void init() {
         videoview.setMediaController(new MediaController(this));
         view = LayoutInflater.from(MainActivity.this).inflate(R.layout
-                .alert_view, null);
+                .alert_login_view, null);
         device_id = (EditText) view.findViewById(R.id.edt_userid);
         deviceLoginPresenter = new DeviceLoginPresenter(this);
         deviceDownLoadVideoPresenter = new DeviceDownLoadVideoPresenter(this);
@@ -238,74 +238,74 @@ public class MainActivity extends Activity implements IDeviceLoginView, IDeviceD
         }
         final AdsPlayData.DataBean adsData = adslist.get(adsposition);//广告数据
         if (TimeUtil.isNEWDay(adsData.getTime())) { //判断是否是今天
-//            if (!TimeUtil.initWeclomeText().equals(adsData.getType())) {//判断是否是当前时间段
-//                adsposition++;
-//                initimager();
-//            } else {
-            if (NetworkUtils.isConnected(this)) {
-                getAdsPlayListUtil.setPlayCount(adsData.getId());//广告自增
-            }
-            Log.i("adsPlay_id", adsData.getTime() + "");
-            description.setText(adsData.getDescription());
-            flytxtview.setText("本视频由\"" + adsData.getShop_name() + "\"特约播出 (" + adsData.getShop_address() + ")");
-            content.setText(adsData.getContent());
-            ivList = new ArrayList<ImageView>();
-            strimage = StringUtil.StringSplit(adsData.getImglist());
-            for (int i = 0; i < strimage.length; i++) {
-                ImageView iv = new ImageView(getApplicationContext());
-                Glide.with(getApplicationContext())
-                        .load(strimage[i])
-                        .into(iv);
-                ivList.add(iv);
-            }
-            Glide.with(x.app()).load(adsData.getQrcode()).into(qrcode);
-            Glide.with(x.app()).load(adsData.getItem_img()).into(itemImg);
-            carouselPagerAdapter = new CarouselPagerAdapter(ivList);
-            int width = mCarouselView.getWidth();
-            int height = mCarouselView.getHeight();
-            Log.i("width", width + "");
-            Log.i("height", height + "");
-            mCarouselView.setAdapter(carouselPagerAdapter);
-            mCarouselView.setDisplayTime(20000);
-            ViewPagerScroller scroller = new ViewPagerScroller(getApplicationContext());
-            scroller.setScrollDuration(5000);
-            scroller.initViewPagerScroll(mCarouselView);
-            mCarouselView.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-                @Override
-                public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
+            if (!TimeUtil.initWeclomeText().equals(adsData.getType())) {//判断是否是当前时间段
+                adsposition++;
+                initimager();
+            } else {
+                if (NetworkUtils.isConnected(this)) {
+                    getAdsPlayListUtil.setPlayCount(adsData.getId());//广告自增
                 }
-
-                @Override
-                public void onPageSelected(int position) {
-
+                Log.i("adsPlay_id", adsData.getTime() + "");
+                description.setText(adsData.getDescription());
+                flytxtview.setText("本视频由\"" + adsData.getShop_name() + "\"特约播出 (" + adsData.getShop_address() + ")");
+                content.setText(adsData.getContent());
+                ivList = new ArrayList<ImageView>();
+                strimage = StringUtil.StringSplit(adsData.getImglist());
+                for (int i = 0; i < strimage.length; i++) {
+                    ImageView iv = new ImageView(getApplicationContext());
+                    Glide.with(getApplicationContext())
+                            .load(strimage[i])
+                            .into(iv);
+                    ivList.add(iv);
                 }
+                Glide.with(x.app()).load(adsData.getQrcode()).into(qrcode);
+                Glide.with(x.app()).load(adsData.getItem_img()).into(itemImg);
+                carouselPagerAdapter = new CarouselPagerAdapter(ivList);
+                int width = mCarouselView.getWidth();
+                int height = mCarouselView.getHeight();
+                Log.i("width", width + "");
+                Log.i("height", height + "");
+                mCarouselView.setAdapter(carouselPagerAdapter);
+                mCarouselView.setDisplayTime(20000);
+                ViewPagerScroller scroller = new ViewPagerScroller(getApplicationContext());
+                scroller.setScrollDuration(5000);
+                scroller.initViewPagerScroll(mCarouselView);
+                mCarouselView.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+                    @Override
+                    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
-                @Override
-                public void onPageScrollStateChanged(int state) {
-                    if (state == ViewPager.SCROLL_STATE_DRAGGING) {
-                        //正在滑动   pager处于正在拖拽中
-                        Log.d("测试代码", "onPageScrollStateChanged=======正在滑动" + "SCROLL_STATE_DRAGGING");
-                    } else if (state == ViewPager.SCROLL_STATE_SETTLING) {
-                        //pager 正在自动沉降，相当于松手后，pager恢复到一个完整pager的过程
-                        Log.d("测试代码", "onPageScrollStateChanged=======自动沉降" + "SCROLL_STATE_SETTLING");
-                        imageposition++;
-                        if (strimage.length == imageposition) {
-                            imageposition = 0;
-                            adsposition++;
-                            initimager();
-                        } else {
-                            videoview.pause();
-                        }
-                    } else if (state == ViewPager.SCROLL_STATE_IDLE) {
-                        //空闲状态  pager处于空闲状态
-                        Log.d("测试代码", "onPageScrollStateChanged=======空闲状态" + "SCROLL_STATE_IDLE");
-                        videoview.start();
                     }
-                }
-            });
-            mCarouselView.start();
-//            }
+
+                    @Override
+                    public void onPageSelected(int position) {
+
+                    }
+
+                    @Override
+                    public void onPageScrollStateChanged(int state) {
+                        if (state == ViewPager.SCROLL_STATE_DRAGGING) {
+                            //正在滑动   pager处于正在拖拽中
+                            Log.d("测试代码", "onPageScrollStateChanged=======正在滑动" + "SCROLL_STATE_DRAGGING");
+                        } else if (state == ViewPager.SCROLL_STATE_SETTLING) {
+                            //pager 正在自动沉降，相当于松手后，pager恢复到一个完整pager的过程
+                            Log.d("测试代码", "onPageScrollStateChanged=======自动沉降" + "SCROLL_STATE_SETTLING");
+                            imageposition++;
+                            if (strimage.length == imageposition) {
+                                imageposition = 0;
+                                adsposition++;
+                                initimager();
+                            } else {
+                                videoview.pause();
+                            }
+                        } else if (state == ViewPager.SCROLL_STATE_IDLE) {
+                            //空闲状态  pager处于空闲状态
+                            Log.d("测试代码", "onPageScrollStateChanged=======空闲状态" + "SCROLL_STATE_IDLE");
+                            videoview.start();
+                        }
+                    }
+                });
+                mCarouselView.start();
+            }
         } else {
             adsposition++;
             initimager();
@@ -366,7 +366,7 @@ public class MainActivity extends Activity implements IDeviceLoginView, IDeviceD
     public void builderShow() {
         SharedPreferencesUtils.setParam(x.app(), LoginId.DEVICELOGINSTATE, "");
         view = LayoutInflater.from(MainActivity.this).inflate(R.layout
-                .alert_view, null);
+                .alert_login_view, null);
         device_id = (EditText) view.findViewById(R.id.edt_userid);
         builder = new AlertDialog.Builder(MainActivity.this);
         builder.setTitle("请输入设备ID号");

@@ -13,6 +13,8 @@ public class TimeUtil {
     /**
      * 修改系统时间
      * 根据时间戳修改
+     *
+     * @param time
      */
     public static void testDate(String time) {
         try {
@@ -31,8 +33,6 @@ public class TimeUtil {
 
     /**
      * 判断当前时间是上午还是下午
-     *
-     * @return
      */
     public static String initWeclomeText() {
         Time t = new Time();

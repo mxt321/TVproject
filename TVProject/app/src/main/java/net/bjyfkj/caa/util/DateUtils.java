@@ -1,9 +1,9 @@
 package net.bjyfkj.caa.util;
 
-import java.util.Locale;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
 
 /**
@@ -260,6 +260,8 @@ public class DateUtils {
      */
     public static String timesTwo(String time) {
         TimeZone.setDefault(TimeZone.getTimeZone("GMT+08:00"));//更改中国时区
+//        AlarmManager mAlarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+//        mAlarmManager.setTimeZone("GMT+08:00");
         long i = Integer.parseInt(time);
         String date = new java.text.SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date(i * 1000L));
         return date;
