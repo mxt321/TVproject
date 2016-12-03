@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal">
@@ -40,7 +41,6 @@
                 <net.bjyfkj.caa.model.AlwaysMarqueeTextView
                     android:id="@+id/flytxtview"
                     android:layout_width="match_parent"
-                    android:layout_height="60dp"
                     android:layout_alignParentBottom="true"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true"
@@ -54,7 +54,8 @@
                     android:scrollHorizontally="true"
                     android:singleLine="true"
                     android:textColor="@android:color/holo_red_dark"
-                    android:textSize="28dp" />
+                    android:textSize="56px"
+                    android:layout_height="120px" />
 
                 <net.bjyfkj.caa.model.opendanmaku.DanmakuView
                     android:id="@+id/danmakuView"
@@ -65,14 +66,14 @@
                     app:max_running_per_row="2"
                     app:pick_interval="1000"
                     app:show_debug="false"
-                    app:start_Y_offset="0.2"/>
+                    app:start_Y_offset="0.2" />
 
             </RelativeLayout>
 
 
         </LinearLayout>
 
-        <LinearLayout
+        <RelativeLayout
             android:id="@+id/show"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -111,6 +112,7 @@
             <!--android:singleLine="true"-->
             <!--android:textColor="@android:color/holo_red_dark"-->
             <!--android:textSize="50dp" />-->
+
             <TextView
                 android:id="@+id/content"
                 android:layout_width="match_parent"
@@ -118,8 +120,20 @@
                 android:layout_gravity="center_horizontal"
                 android:gravity="center"
                 android:textColor="@android:color/holo_red_dark"
-                android:textSize="50dp" />
-        </LinearLayout>
+                android:textSize="100px"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true" />
+
+            <com.facebook.drawee.view.SimpleDraweeView
+                android:id="@+id/finger"
+                android:layout_width="200px"
+                android:layout_height="200px"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:layout_margin="20px" />
+        </RelativeLayout>
     </LinearLayout>
 
     <LinearLayout
@@ -201,9 +215,10 @@
                     android:layout_alignParentStart="true"
                     android:layout_gravity="bottom"
                     android:gravity="center"
+                    android:paddingBottom="20px"
                     android:textColor="@android:color/holo_red_dark"
-                    android:textSize="25dp"
-                    android:paddingBottom="10dp" />
+                    android:textSize="50px" />
+
             </RelativeLayout>
         </LinearLayout>
     </LinearLayout>

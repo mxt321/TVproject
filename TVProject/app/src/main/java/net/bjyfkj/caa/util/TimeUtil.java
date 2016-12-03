@@ -1,10 +1,10 @@
 package net.bjyfkj.caa.util;
 
-import android.text.format.Time;
 import android.util.Log;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Calendar;
 
 /**
  * Created by YFKJ-1 on 2016/11/7.
@@ -35,14 +35,14 @@ public class TimeUtil {
      * 判断当前时间是上午还是下午
      */
     public static String initWeclomeText() {
-        Time t = new Time();
-        t.setToNow();
-        if (t.hour >= 6 && t.hour <= 14) {
+        Calendar c = Calendar.getInstance();
+        int hour = c.get(Calendar.HOUR_OF_DAY);
+        if (hour <= 14) {
             return "0";
-        } else if (t.hour >= 15 && t.hour <= 23) {
+        } else if (hour >= 15 ) {
             return "1";
         }
-        return null;
+        return "2";
     }
 
     /***

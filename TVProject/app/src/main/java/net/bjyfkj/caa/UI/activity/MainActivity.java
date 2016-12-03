@@ -1,6 +1,6 @@
 package net.bjyfkj.caa.UI.activity;
 
-import android.app.Activity;
+
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.media.MediaPlayer;
@@ -9,6 +9,7 @@ import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.MediaController;
@@ -16,6 +17,8 @@ import android.widget.TextView;
 import android.widget.VideoView;
 
 import com.bumptech.glide.Glide;
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.zhy.autolayout.AutoLayoutActivity;
 
 import net.bjyfkj.caa.R;
 import net.bjyfkj.caa.UI.adapter.CarouselPagerAdapter;
@@ -66,8 +69,7 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import cn.jpush.android.api.JPushInterface;
 
-
-public class MainActivity extends Activity implements IDeviceLoginView, IDeviceDownLoadVideoView, IDeviceSdCardView {
+public class MainActivity extends AutoLayoutActivity implements IDeviceLoginView, IDeviceDownLoadVideoView, IDeviceSdCardView {
 
 
     @InjectView(R.id.videoview)
@@ -86,7 +88,8 @@ public class MainActivity extends Activity implements IDeviceLoginView, IDeviceD
     ImageView itemImg;
     @InjectView(R.id.description)
     TextView description;
-
+//    @InjectView(R.id.finger)
+//    SimpleDraweeView finger;
 
     private final String ACTION = "android.service.APPUPDATE";
     private AlertDialog.Builder builder;
@@ -108,15 +111,19 @@ public class MainActivity extends Activity implements IDeviceLoginView, IDeviceD
     private int imageposition = 0;
     private List<IDanmakuItem> danmakuItemList;//弹幕列表
     private boolean isPlaying = false; //视频是否正在播放
+    private boolean adscount = true;//判断当前广告列表是否存在当前时间段的广告
 
     @Override
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main1);
-        ButterKnife.inject(this);
-        EventBus.getDefault().register(this);
-        danmakuView.show();
+        Fresco.initialize(this);//注册Fresco
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);// 隐藏状态栏
+        setContentView(R.layout.activity_main1);//加载布局
+        ButterKnife.inject(this);//注册ButterKnife
+        EventBus.getDefault().register(this);//注册EventBus
+        danmakuView.show();//显示弹幕
     }
 
     @Override
@@ -232,6 +239,9 @@ public class MainActivity extends Activity implements IDeviceLoginView, IDeviceD
         }
         if (adsposition == adslist.size()) {
             adsposition = 0;
+            if (!adscount) {//如果当前广告列表没有当前时间段要播放的广告 则停止
+                return;
+            }
         }
         if (ivList != null) {
             ivList = null;
@@ -242,6 +252,7 @@ public class MainActivity extends Activity implements IDeviceLoginView, IDeviceD
                 adsposition++;
                 initimager();
             } else {
+                adscount = true;
                 if (NetworkUtils.isConnected(this)) {
                     getAdsPlayListUtil.setPlayCount(adsData.getId());//广告自增
                 }
@@ -260,6 +271,12 @@ public class MainActivity extends Activity implements IDeviceLoginView, IDeviceD
                 }
                 Glide.with(x.app()).load(adsData.getQrcode()).into(qrcode);
                 Glide.with(x.app()).load(adsData.getItem_img()).into(itemImg);
+////                Glide.with(x.app()).load("http://pics.sc.chinaz.com/Files/pic/faces/4360/01.gif").asGif().into(finger);
+//                SimpleDraweeView finger = (SimpleDraweeView) findViewById(R.id.finger);
+//                Uri uri = Uri.parse("http://pics.sc.chinaz.com/Files/pic/faces/4360/01.gif");
+//                DraweeController dc = Fresco.newDraweeControllerBuilder().setUri(uri).setAutoPlayAnimations(true).build();
+//                finger.setController(dc);
+
                 carouselPagerAdapter = new CarouselPagerAdapter(ivList);
                 int width = mCarouselView.getWidth();
                 int height = mCarouselView.getHeight();
@@ -504,6 +521,7 @@ public class MainActivity extends Activity implements IDeviceLoginView, IDeviceD
     //获取广告信息
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void getAdsPlayList(GetAdsPlayListEventBus getAdsPlayListEventBus) {
+        adscount = true;
         adslist = getAdsPlayListEventBus.result;
         if (!isRotation) {
             isRotation = true;

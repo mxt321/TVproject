@@ -12,7 +12,7 @@ import net.bjyfkj.caa.util.AppUpdate;
  * Created by YFKJ-1 on 2016/11/22.
  */
 
-public class AppUpdateService extends Service {
+public class   AppUpdateService extends Service {
 
     @Override
     public void onCreate() {
