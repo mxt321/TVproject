@@ -129,10 +129,10 @@
                 android:id="@+id/finger"
                 android:layout_width="200px"
                 android:layout_height="200px"
+                android:layout_marginTop="11dp"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true"
-                android:layout_margin="20px" />
+                android:layout_alignParentEnd="true" />
         </RelativeLayout>
     </LinearLayout>
 

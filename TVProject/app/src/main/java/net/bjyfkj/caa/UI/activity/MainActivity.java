@@ -4,6 +4,7 @@ package net.bjyfkj.caa.UI.activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
@@ -18,6 +19,8 @@ import android.widget.VideoView;
 
 import com.bumptech.glide.Glide;
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.interfaces.DraweeController;
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.zhy.autolayout.AutoLayoutActivity;
 
 import net.bjyfkj.caa.R;
@@ -88,15 +91,13 @@ public class MainActivity extends AutoLayoutActivity implements IDeviceLoginView
     ImageView itemImg;
     @InjectView(R.id.description)
     TextView description;
-//    @InjectView(R.id.finger)
-//    SimpleDraweeView finger;
-
-    private final String ACTION = "android.service.APPUPDATE";
+    @InjectView(R.id.finger)
+    SimpleDraweeView finger;
     private AlertDialog.Builder builder;
     private View view;
-    private DeviceLoginPresenter deviceLoginPresenter;
-    private DeviceDownLoadVideoPresenter deviceDownLoadVideoPresenter;
-    private DeviceSdCardListPresenter deviceSdCardListPresenter;
+    private DeviceLoginPresenter deviceLoginPresenter;//MVP
+    private DeviceDownLoadVideoPresenter deviceDownLoadVideoPresenter;//MVP
+    private DeviceSdCardListPresenter deviceSdCardListPresenter;//MVP
     private EditText device_id;
     private List<VideoData.DataBean> videolist;//服务器视频列表
     private List<Map<String, String>> sdlist = new ArrayList<Map<String, String>>();
@@ -112,12 +113,13 @@ public class MainActivity extends AutoLayoutActivity implements IDeviceLoginView
     private List<IDanmakuItem> danmakuItemList;//弹幕列表
     private boolean isPlaying = false; //视频是否正在播放
     private boolean adscount = true;//判断当前广告列表是否存在当前时间段的广告
+    private ImageView iv;
 
     @Override
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Fresco.initialize(this);//注册Fresco
+        Fresco.initialize(this);//注册Fresco0
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);// 隐藏状态栏
         setContentView(R.layout.activity_main1);//加载布局
@@ -129,49 +131,6 @@ public class MainActivity extends AutoLayoutActivity implements IDeviceLoginView
     @Override
     protected void onStart() {
         super.onStart();
-        if (NetworkUtils.isConnected(MainActivity.this)) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        Thread.sleep(15000);
-                        AppUpdate app = new AppUpdate(MainActivity.this);
-                        Log.i("AppUpdate", "检查应用版本号");
-                        app.checkUpdateForTV(new AppUpdate.OnResult() {
-                            @Override
-                            public void onNewVersion() {
-                                Log.i("onNewVersion", "app有新版本");
-                            }
-
-                            @Override
-                            public void onLatestVersion() {
-                                Log.i("onLatestVersion", "app已是最新版本");
-                            }
-
-                            @Override
-                            public void onDownloading(long current, long total) {
-                                Log.i("onDownloading", "app正在下载");
-                            }
-
-                            @Override
-                            public void onDownLoaCompleted() {
-                                Log.i("onDownLoaCompleted", "app下载成功");
-                            }
-
-                            @Override
-                            public void onError() {
-                                Log.i("onError", "app下载失败");
-                            }
-                        });
-
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }).start();
-        } else {
-            Log.i("AppUpdate", "WIFI没有连接");
-        }
         init();
     }
 
@@ -207,7 +166,10 @@ public class MainActivity extends AutoLayoutActivity implements IDeviceLoginView
      * 初始化
      */
     public void init() {
-        videoview.setMediaController(new MediaController(this));
+        Uri uri = Uri.parse("http://pics.sc.chinaz.com/Files/pic/faces/4360/01.gif");
+        DraweeController dc = Fresco.newDraweeControllerBuilder().setUri(uri).setAutoPlayAnimations(true).build();
+        finger.setController(dc);
+        videoview.setMediaController(new MediaController(this));//
         view = LayoutInflater.from(MainActivity.this).inflate(R.layout
                 .alert_login_view, null);
         device_id = (EditText) view.findViewById(R.id.edt_userid);
@@ -232,6 +194,9 @@ public class MainActivity extends AutoLayoutActivity implements IDeviceLoginView
      */
     private void initimager() {
         if (strimage != null) {
+            for (int i = 0; i < strimage.length; i++) {
+                strimage[i] = null;
+            }
             strimage = null;
         }
         if (carouselPagerAdapter != null) {
@@ -253,7 +218,7 @@ public class MainActivity extends AutoLayoutActivity implements IDeviceLoginView
                 initimager();
             } else {
                 adscount = true;
-                if (NetworkUtils.isConnected(this)) {
+                if (NetworkUtils.isConnected(x.app())) {
                     getAdsPlayListUtil.setPlayCount(adsData.getId());//广告自增
                 }
                 Log.i("adsPlay_id", adsData.getTime() + "");
@@ -263,7 +228,9 @@ public class MainActivity extends AutoLayoutActivity implements IDeviceLoginView
                 ivList = new ArrayList<ImageView>();
                 strimage = StringUtil.StringSplit(adsData.getImglist());
                 for (int i = 0; i < strimage.length; i++) {
-                    ImageView iv = new ImageView(getApplicationContext());
+                    if (iv == null) {
+                        iv = new ImageView(getApplicationContext());
+                    }
                     Glide.with(getApplicationContext())
                             .load(strimage[i])
                             .into(iv);
@@ -271,12 +238,6 @@ public class MainActivity extends AutoLayoutActivity implements IDeviceLoginView
                 }
                 Glide.with(x.app()).load(adsData.getQrcode()).into(qrcode);
                 Glide.with(x.app()).load(adsData.getItem_img()).into(itemImg);
-////                Glide.with(x.app()).load("http://pics.sc.chinaz.com/Files/pic/faces/4360/01.gif").asGif().into(finger);
-//                SimpleDraweeView finger = (SimpleDraweeView) findViewById(R.id.finger);
-//                Uri uri = Uri.parse("http://pics.sc.chinaz.com/Files/pic/faces/4360/01.gif");
-//                DraweeController dc = Fresco.newDraweeControllerBuilder().setUri(uri).setAutoPlayAnimations(true).build();
-//                finger.setController(dc);
-
                 carouselPagerAdapter = new CarouselPagerAdapter(ivList);
                 int width = mCarouselView.getWidth();
                 int height = mCarouselView.getHeight();
@@ -330,6 +291,54 @@ public class MainActivity extends AutoLayoutActivity implements IDeviceLoginView
 
     }
 
+    /**
+     * app自动更新
+     */
+    public void appUpdate() {
+        if (NetworkUtils.isConnected(MainActivity.this)) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Thread.sleep(15000);
+                        AppUpdate app = new AppUpdate(MainActivity.this);
+                        Log.i("AppUpdate", "检查应用版本号");
+                        app.checkUpdateForTV(new AppUpdate.OnResult() {
+                            @Override
+                            public void onNewVersion() {
+                                Log.i("onNewVersion", "app有新版本");
+                            }
+
+                            @Override
+                            public void onLatestVersion() {
+                                Log.i("onLatestVersion", "app已是最新版本");
+                            }
+
+                            @Override
+                            public void onDownloading(long current, long total) {
+                                Log.i("onDownloading", "app正在下载");
+                            }
+
+                            @Override
+                            public void onDownLoaCompleted() {
+                                Log.i("onDownLoaCompleted", "app下载成功");
+                            }
+
+                            @Override
+                            public void onError() {
+                                Log.i("onError", "app下载失败");
+                            }
+                        });
+
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+        } else {
+            Log.i("AppUpdate", "网络没有连接");
+        }
+    }
 
     @Override
     public String getDeviceId() {
@@ -355,6 +364,7 @@ public class MainActivity extends AutoLayoutActivity implements IDeviceLoginView
     @Override
     public void isdialog(String deviceid, boolean isSuccess) {
         if (isSuccess) {
+            appUpdate();
             SharedPreferencesUtils.setParam(x.app(), LoginId.DEVICELOGINSTATE, deviceid + "");
             JPushUtil.setAlias(x.app(), "d" + deviceid);
             deviceLoginPresenter.updateDeviceTime();
@@ -387,6 +397,7 @@ public class MainActivity extends AutoLayoutActivity implements IDeviceLoginView
         device_id = (EditText) view.findViewById(R.id.edt_userid);
         builder = new AlertDialog.Builder(MainActivity.this);
         builder.setTitle("请输入设备ID号");
+        builder.setCancelable(false);
         builder.setView(view);
         builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
             @Override

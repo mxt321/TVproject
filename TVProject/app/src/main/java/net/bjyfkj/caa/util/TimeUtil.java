@@ -36,10 +36,11 @@ public class TimeUtil {
      */
     public static String initWeclomeText() {
         Calendar c = Calendar.getInstance();
-        int hour = c.get(Calendar.HOUR_OF_DAY);
+        int hour = c.get(Calendar.HOUR_OF_DAY) - 8;
+        Log.i("hour", "当前时辰是：" + hour);
         if (hour <= 14) {
             return "0";
-        } else if (hour >= 15 ) {
+        } else if (hour >= 15) {
             return "1";
         }
         return "2";
@@ -60,4 +61,4 @@ public class TimeUtil {
         }
         return false;
     }
-}
+};
