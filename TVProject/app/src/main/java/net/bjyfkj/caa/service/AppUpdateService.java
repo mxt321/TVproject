@@ -12,7 +12,7 @@ import net.bjyfkj.caa.util.AppUpdate;
  * Created by YFKJ-1 on 2016/11/22.
  */
 
-public class   AppUpdateService extends Service {
+public class AppUpdateService extends Service {
 
     @Override
     public void onCreate() {
@@ -28,27 +28,27 @@ public class   AppUpdateService extends Service {
         app.checkUpdateForTV(new AppUpdate.OnResult() {
             @Override
             public void onNewVersion() {
-                Log.i("onNewVersion","app有新版本");
+                Log.i("onNewVersion", "app有新版本");
             }
 
             @Override
             public void onLatestVersion() {
-                Log.i("onLatestVersion","app已是最新版本");
+                Log.i("onLatestVersion", "app已是最新版本");
             }
 
             @Override
             public void onDownloading(long current, long total) {
-                Log.i("onDownloading","app正在下载");
+                Log.i("onDownloading", "app正在下载");
             }
 
             @Override
             public void onDownLoaCompleted() {
-                Log.i("onDownLoaCompleted","app下载成功");
+                Log.i("onDownLoaCompleted", "app下载成功");
             }
 
             @Override
             public void onError() {
-                Log.i("onError","app下载失败");
+                Log.i("onError", "app下载失败");
             }
         });
         return null;

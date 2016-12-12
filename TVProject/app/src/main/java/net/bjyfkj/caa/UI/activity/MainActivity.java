@@ -33,7 +33,7 @@ import net.bjyfkj.caa.eventBus.GetAdsPlayListEventBus;
 import net.bjyfkj.caa.eventBus.JPushEventBus;
 import net.bjyfkj.caa.eventBus.UpdateVideoEventBus;
 import net.bjyfkj.caa.model.CarouselViewPager;
-import net.bjyfkj.caa.model.Login;
+import net.bjyfkj.caa.util.Login;
 import net.bjyfkj.caa.model.ViewPagerScroller;
 import net.bjyfkj.caa.model.opendanmaku.DanmakuItem;
 import net.bjyfkj.caa.model.opendanmaku.DanmakuView;
@@ -299,40 +299,34 @@ public class MainActivity extends AutoLayoutActivity implements IDeviceLoginView
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    try {
-                        Thread.sleep(15000);
-                        AppUpdate app = new AppUpdate(MainActivity.this);
-                        Log.i("AppUpdate", "检查应用版本号");
-                        app.checkUpdateForTV(new AppUpdate.OnResult() {
-                            @Override
-                            public void onNewVersion() {
-                                Log.i("onNewVersion", "app有新版本");
-                            }
+                    AppUpdate app = new AppUpdate(MainActivity.this);
+                    Log.i("AppUpdate", "检查应用版本号");
+                    app.checkUpdateForTV(new AppUpdate.OnResult() {
+                        @Override
+                        public void onNewVersion() {
+                            Log.i("onNewVersion", "app有新版本");
+                        }
 
-                            @Override
-                            public void onLatestVersion() {
-                                Log.i("onLatestVersion", "app已是最新版本");
-                            }
+                        @Override
+                        public void onLatestVersion() {
+                            Log.i("onLatestVersion", "app已是最新版本");
+                        }
 
-                            @Override
-                            public void onDownloading(long current, long total) {
-                                Log.i("onDownloading", "app正在下载");
-                            }
+                        @Override
+                        public void onDownloading(long current, long total) {
+                            Log.i("onDownloading", "app正在下载");
+                        }
 
-                            @Override
-                            public void onDownLoaCompleted() {
-                                Log.i("onDownLoaCompleted", "app下载成功");
-                            }
+                        @Override
+                        public void onDownLoaCompleted() {
+                            Log.i("onDownLoaCompleted", "app下载成功");
+                        }
 
-                            @Override
-                            public void onError() {
-                                Log.i("onError", "app下载失败");
-                            }
-                        });
-
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                        @Override
+                        public void onError() {
+                            Log.i("onError", "app下载失败");
+                        }
+                    });
                 }
             }).start();
         } else {
