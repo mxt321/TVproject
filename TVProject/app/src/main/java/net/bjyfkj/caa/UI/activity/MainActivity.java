@@ -116,7 +116,6 @@ public class MainActivity extends AutoLayoutActivity implements IDeviceLoginView
     private ImageView iv;
 
     @Override
-
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Fresco.initialize(this);//注册Fresco0
